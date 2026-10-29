@@ -1,0 +1,21 @@
+{
+ "retrieved":"2026-10-29",
+ "statements":55634,
+ "items":20179,
+ "excluded":{
+  "a whole country":31,
+  "no coordinates":109,
+  "not a place (school, park, organisation)":42
+ },
+ "pairs_dropped":{
+  "partner excluded or missing":283
+ },
+ "places":19976,
+ "pairs":29437,
+ "wp_pages":85,
+ "wp_pairs":34972,
+ "country_src":{
+  "point in polygon":19967,
+  "Wikidata P17":9
+ }
+}
