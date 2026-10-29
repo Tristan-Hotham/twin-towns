@@ -1,0 +1,162 @@
+<!-- wp:paragraph -->
+<p><em>I drew every twin town and sister city link on Wikidata, {{meta.pairs|int}} of them, as arcs on one map. The web shows a continent making peace after 1945, quiet links across the Iron Curtain, a rush when the Wall fell, Japan and China reaching out, and the links cut after 2022.</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/twin-towns/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23763153">Read the paper</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p>Drive into almost any town in Europe and a sign at the edge tells you its twins. Coventry, Cheltenham, Keighley: each has a small list of places abroad it has promised friendship to, usually signed decades ago by a mayor nobody now remembers. Most of us could not name our own town's twins. But add them all up and you get one of the densest webs of everyday international contact in the world.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Wikidata, the open database behind Wikipedia, records twinnings with a single property, "twinned administrative body". I took every one of its {{meta.statements|int}} statements, merged the two directions of each link, and ended up with {{meta.pairs|int}} pairs between {{meta.places|int}} places in {{meta.countries|int}} countries and territories. About a third of them, {{dates.n_dated|int}}, also say when the link began.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The web</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_map.png|World map criss-crossed by thousands of faint arcs joining twinned towns. A dense knot sits over western and central Europe, drawn mostly in blue for early links; thick bundles arc from Europe to North America and to Japan and China; Japan glows green for links from the 1980s and China orange and red for later ones.|Every twinning on Wikidata, drawn along the great-circle route and coloured by the decade it began. Grey links have no start date.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Europe is the knot in the middle. {{v.within_europe_pct|raw}} of all pairs join two European places, and the median twin lives just {{distance.median_km|int}} km away. The most common pair of countries is France and Germany, with {{pairs_story.FRA_DEU.total|int}} town pairs, more than any country has with itself. Then come towns within Germany ({{domestic.top.0.2|int}}), France and Italy ({{country_pairs.2.4|int}}) and France and the UK ({{country_pairs.3.4|int}}).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">A post-war idea</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_years.png|Bar chart of new twinnings by start year from 1945. Bars are low in the late 1940s, climb through the 1960s and 1970s, rise steeply in the late 1980s to a peak of 298 in 1990, stay high through the 1990s and 2000s, then fall after 2015.|New twinnings with a start date on Wikidata, by year.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Twinning took off after the Second World War. Only {{v.before_1950|int}} dated pairs began before 1950. The 1950s added {{dates.by_decade.1950|int}}, the 1960s {{dates.by_decade.1960|int}}, and the numbers kept climbing until the busiest single year of all: {{dates.peak_year|raw}}, with {{dates.peak_year_n|int}} new links. More than two thirds of all dated twinnings ({{v.share_90s_pct|raw}}) began in 1990 or later.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The early years belong to France and Germany. Links involving a French town were {{v.fra_50s_pct|raw}} of all new dated twinnings in the 1950s, and links involving a German town {{v.deu_60s_pct|raw}} in the 1960s. Franco-German pairs alone peaked in the 1960s, when they were {{v.fra_deu_60s_pct|raw}} of everything new. Britain followed on a smaller scale: of the {{uk.pairs|int}} links involving a UK place, {{v.uk_fra_pct|raw}} are with France and {{v.uk_deu_pct|raw}} with Germany.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_pairs.png|Line chart of the share of each decade's new twinnings joining pairs of countries. France and Germany rises to about 22 per cent in the 1960s and then falls steadily to near zero. France and UK and Germany and UK start around 10 per cent in the 1950s and fall. Germany and Poland stays low but peaks in the 1990s.|Share of each decade's new dated twinnings that join two named countries.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Coventry is a good example of how early and how political this could be. Its first dated link on Wikidata is with {{coventry.partners.0.0|raw}}, the former Stalingrad, in {{coventry.partners.0.2|raw}}, while the war was still on. By 1963 it had added Warsaw, Belgrade, Sarajevo, Ostrava, Caen, Graz, Kiel and Dresden.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Across the Iron Curtain</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>To look at the Cold War I put each place into one of two camps by its present country: an Eastern bloc (the Warsaw Pact and the Soviet republics, plus the five eastern German states) and a West (NATO as it stood in 1989, western Germany and the western neutrals). It is a rough proxy, but it shows something clear. Of dated twinnings that began before 1990, {{v.ew_pre90_pct|raw}} crossed between the camps. In the 1990s that share nearly doubled, to {{v.ew_90s_pct|raw}}, as towns in Poland, eastern Germany, Russia and Hungary signed up with partners in the West.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_iron.png|Two maps of Europe with land tinted rose for the Eastern bloc and blue for the West. The left map shows 469 blue arcs for East and West links begun before 1990, densest between France, Germany and Poland. The right map shows 727 pink arcs for the 1990s, much denser across central and eastern Europe.|Dated links between the Cold War camps, begun before 1990 (left) and in the 1990s (right).}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Before 1990 the Western side of those links was most often French ({{cold_war.west_before_1990.0.2|int}}), West German ({{cold_war.west_before_1990.1.2|int}}) or, strikingly, Finnish ({{cold_war.west_before_1990.2.2|int}}). The sharpest story is inside Germany. Of {{inner_german.domestic_de|int}} pairs of German towns, {{inner_german.n|int}} join a town in the old East with one in the old West. Only {{inner_german.dated|int}} of those have a date, but {{inner_german.in_1990|int}} of them were made in 1990 alone, the year of reunification, and {{inner_german.before_1990|int}} even before 1990, most of them from 1987 to 1989, after Saarlouis and Eisenhüttenstadt led the way in 1986.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>The busiest year for twinning was 1990, the year after the Berlin Wall fell.</p></blockquote></figure>
+<!-- /wp:pullquote -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Further apart</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The first twins were neighbours. Of the pairs dated to the 1950s, only {{v.ic_50s_pct|raw}} crossed between continents. By the 1980s it was {{v.ic_80s_pct|raw}}, and the median distance had more than doubled, from {{distance.by_decade.1950.median_km|int}} km to {{distance.by_decade.1980.median_km|int}} km. Japan led that reach. It has {{country_story.JPN.total|int}} twinnings, {{country_story.JPN.top_partners.1.2|int}} of them with American towns, and in the 1980s it was part of {{v.jpn_80s_pct|raw}} of all new dated links. China came later: its median start year is {{country_story.CHN.median_year|raw}}, and its partners are most often in Japan ({{country_story.CHN.top_partners.0.2|int}}), the United States ({{country_story.CHN.top_partners.1.2|int}}) and Russia ({{country_story.CHN.top_partners.2.2|int}}).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_reach.png|Two line charts. Left: the share of new twinnings between continents rises from 4 per cent in the 1940s to 44 per cent in the 1980s and stays between a third and 44 per cent after. Right: Japan's share of new twinnings peaks at 21 per cent in the 1980s; China's rises to 17 per cent in the 2010s; the United States peaks at 14 per cent in the 1980s.|Left: share of new dated twinnings between continents, with median distances. Right: share of new dated twinnings that include Japan, China or the United States.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Champions and namesakes</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Most places are modest twinners: {{v.share_one_pct|raw}} have exactly one partner. A few are collectors. {{top_places.0.0|raw}} has {{top_places.0.2|int}}, {{top_places.1.0|raw}} {{top_places.1.2|int}}, and Shanghai and Kyiv {{top_places.2.2|int}} each. My favourite is Bethlehem, a town of about {{named.bethlehem.3|int}} people, with {{named.bethlehem.2|int}} partners: more than London ({{named.london.2|int}}), Berlin ({{named.berlin.2|int}}) or Paris ({{named.paris.2|int}}).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_top.png|Two bar charts. Left: places with the most twinnings, led by Rio de Janeiro with 122 and Saint Petersburg with 118, then Shanghai, Kyiv, Moscow, Istanbul, Beijing and Buenos Aires. Right: the most common pairs of countries, led by Germany and France with 1,442, then within Germany, France and Italy, and France and the UK.|The most-twinned places, and the most common pairs of countries.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some towns twin with their own name. I found {{namesakes.n|int}} pairs of namesakes in different countries, most often British and American ({{namesakes.top_countries.0.1|int}} pairs): Boston and Boston, Cambridge and Cambridge, Plymouth, Portsmouth, Worcester. Perth in Scotland is twinned with both Perth in Australia and Perth in Canada, and Coventry with three American Coventries. Best of all, the four Trujillos in Spain, Peru, Venezuela and Honduras are all twinned with one another.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The links that were cut</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>After Russia's full-scale invasion of Ukraine in 2022, many councils suspended or ended their links with Russian and Belarusian towns. Wikidata records {{ended.since_2022|int}} twinnings as ended in 2022 or later, and {{ended.since_2022_rus_blr|int}} of those involve a Russian or Belarusian place. Their partners were most often in Poland ({{ended.by_country.0.2|int}}), Lithuania ({{ended.by_country.1.2|int}}) and Finland ({{ended.by_country.2.2|int}}). This is surely an undercount: {{ended.rus_still_open|int}} Russian twinnings carry no end date at all, and an end only appears when someone adds it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_ended.png|Bar chart of Russian or Belarusian twinnings recorded as ended since 2022, by the partner's country: Poland 29, Lithuania 15, Finland 12, Ukraine 7, then the United States, Czechia, Germany, the United Kingdom, Estonia and the Netherlands with 2 to 5 each.|Russian and Belarusian twinnings recorded on Wikidata as ended since 2022, by partner country.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">How I did this</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I queried every Wikidata twinning statement, with its start and end dates where given, through the QLever SPARQL endpoint on {{meta.retrieved|raw}}. I merged the two directions of each link, gave every place a present-day country from its coordinates, and dropped items with no coordinates, whole countries, and a few schools and parks. On the map, each link follows the great-circle route, bowed slightly so short links read as arcs. Where the two sides gave different start years I used the earlier.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The big caveat is coverage. As a check I read all {{wikipedia_check.pages|int}} of English Wikipedia's "List of twin towns and sister cities" pages, and only {{v.wp_match_pct|raw}} of their partner lines matched a Wikidata pair by name. Name matching misses some real matches, but Wikidata is clearly a large sample of the world's twinnings, not a full list, and coverage varies by country. Only about a third of pairs have a start date, so treat the timing patterns as shapes rather than exact counts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://maps.tristanhotham.com/twin-towns/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23763153">Read the paper</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://github.com/Tristan-Hotham/twin-towns">Data and code</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Notes and sources</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Twinnings, places, coordinates and dates: <a href="https://www.wikidata.org/wiki/Property:P190">Wikidata property P190</a> (twinned administrative body) with start and end time qualifiers, queried through <a href="https://qlever.cs.uni-freiburg.de">QLever</a> on {{meta.retrieved|raw}} (CC0).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Coverage check: English Wikipedia's {{wikipedia_check.pages|int}} "<a href="https://en.wikipedia.org/wiki/Lists_of_twin_towns_and_sister_cities">List of twin towns and sister cities</a>" pages (CC BY-SA 4.0).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Countries and continents: <a href="https://www.naturalearthdata.com">Natural Earth</a> (public domain). Place names on the interactive map: GeoNames (CC BY 4.0).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Paper, data and code: <a href="https://doi.org/10.5281/zenodo.23763153">Zenodo</a> and <a href="https://github.com/Tristan-Hotham/twin-towns">GitHub</a>. Text, figures and data CC BY 4.0; code MIT.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
