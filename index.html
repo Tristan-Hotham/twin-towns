@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Twin Towns</title>
+<meta name="description" content="Who is your town twinned with? Every twin town and sister city link on Wikidata, 29,437 of them, drawn as arcs on a world map, with start dates, the post-war boom, Cold War links, the rise of Japan and China, and the links cut after 2022.">
+<meta property="og:title" content="Who is your town twinned with?">
+<meta property="og:description" content="29,437 twin town and sister city links between 19,976 places, from Wikidata: when they were made, how far they reach, and which were cut after 2022.">
+<meta property="og:image" content="https://maps.tristanhotham.com/twin-towns/header.png">
+<meta property="og:url" content="https://maps.tristanhotham.com/twin-towns/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Warm letter paper and postmark ink; arc colours come from one table in the script so map, legend and charts agree. */
+:root{
+  --bg:#F8F4EC; --panel:#EFE8DA; --fg:#1F1B24; --muted:#655F6B; --rule:#DED5C4; --card:#FFFCF6; --border:#CBC0AC;
+  --accent:#C2185B; --accent2:#1F5FAD; --sea:#E9EEF0; --land:#F6F1E6; --line:#6A6470; --dot:#2A2430;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14131A; --panel:#1E1C26; --fg:#EEEAE2; --muted:#A8A3AE; --rule:#33303C; --card:#1A1922; --border:#4A4655;
+  --accent:#FF5C93; --accent2:#6FA8FF; --sea:#101219; --land:#1D1D27; --line:#C9C4CF; --dot:#F2EEE6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14131A; --panel:#1E1C26; --fg:#EEEAE2; --muted:#A8A3AE; --rule:#33303C; --card:#1A1922; --border:#4A4655;
+  --accent:#FF5C93; --accent2:#6FA8FF; --sea:#101219; --land:#1D1D27; --line:#C9C4CF; --dot:#F2EEE6; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 18px/1.62 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:700px;margin:0 auto;padding-block:28px 64px}
+.wrap .bleed{width:min(1180px,calc(100vw - 32px));margin-left:calc((100% - min(1180px,100vw - 32px))/2)}
+a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kicker b{background:var(--fg);color:var(--bg);padding:5px 8px;font-weight:500}
+header.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;border-bottom:6px double var(--fg);padding-bottom:22px;margin-top:18px}
+h1{font:900 clamp(38px,9vw,80px)/.94 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;background:linear-gradient(90deg,#1F5FAD,#12A39A 35%,#E8A100 65%,#D7263D);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mark{width:clamp(74px,15vw,124px);height:auto;display:block}
+.dek{grid-column:1/-1;font-size:21px;line-height:1.42;margin:8px 0 0;max-width:54ch}
+.byline{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:14px}
+h2{font:800 34px/1.06 var(--display);letter-spacing:-.01em;margin:56px 0 10px;text-wrap:balance}
+h2 .n{font:500 13px/1 var(--mono);color:var(--accent);display:block;letter-spacing:.1em;margin-bottom:10px}
+h3{font:600 21px/1.25 var(--display);margin:30px 0 6px}
+p{margin:0 0 16px}
+.lede::first-letter{font:900 70px/.8 var(--display);float:left;margin:6px 10px 0 0;color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.stats div{background:var(--card);padding:14px 12px}
+.stats b{display:block;font:900 clamp(22px,4.4vw,32px)/1 var(--display);letter-spacing:-.01em}
+.stats span{font:400 12px/1.35 var(--mono);color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figure{margin:26px 0 30px}
+.fig-h{font:600 19px/1.25 var(--display);margin:0 0 4px}
+.fig-sub{font:400 13px/1.45 var(--mono);color:var(--muted);margin:0 0 12px}
+.src{font:400 12px/1.5 var(--mono);color:var(--muted);margin-top:10px}
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);fill:var(--fg)}
+.lab{font-size:12px}.lab.m{fill:var(--muted)}.lab.b{font-weight:500}.lab.s{font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font:400 12px/1.45 var(--mono);padding:8px 10px;border-radius:3px;max-width:300px;z-index:1000;transform:translate(-50%,calc(-100% - 12px));display:none}
+/* control rows scroll sideways on phones so the map stays in view */
+.ctlrow{display:flex;gap:8px;align-items:center;margin:0 0 8px;flex-wrap:wrap}
+@media (max-width:700px){.ctlrow.scroll{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px;margin-right:-16px;padding-right:16px}}
+.ctl-l{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px;white-space:nowrap;flex:0 0 auto}
+.btn{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;cursor:pointer;min-height:36px;white-space:nowrap;flex:0 0 auto}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;flex:0 0 auto}
+.seg .btn{border:0;border-radius:0;border-right:1px solid var(--border)}
+.seg .btn:last-child{border-right:0}
+.chipk{display:inline-flex;align-items:center;gap:6px;font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:999px;padding:7px 10px 7px 8px;cursor:pointer;min-height:34px;white-space:nowrap;flex:0 0 auto}
+.chipk i{width:18px;height:4px;border-radius:2px;display:inline-block}
+.chipk[aria-pressed="false"]{opacity:.42;text-decoration:line-through}
+.chipk span{color:var(--muted);font-weight:400}
+.searchbox{position:relative;flex:1 1 260px;min-width:0}
+input[type=search]{font:400 15px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 11px;min-height:40px;width:100%}
+.suggest{position:absolute;left:0;right:0;top:100%;margin:2px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--border);z-index:1001;font:400 13px/1.3 var(--mono);display:none;max-height:340px;overflow:auto}
+.suggest li{padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--rule)}
+.suggest li span{color:var(--muted)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--panel)}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+@media (max-width:920px){.mapgrid{grid-template-columns:minmax(0,1fr)}}
+.side{background:var(--card);border:1px solid var(--border);padding:12px 12px 10px;font:400 13px/1.45 var(--mono);min-width:0;max-height:640px;overflow:auto}
+@media (max-width:920px){.side{max-height:none}}
+.side h4{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.side h4:first-child{margin-top:2px}
+.mapbox{position:relative;scroll-margin-top:8px}
+#lmap{height:640px;border:1px solid var(--border);background:var(--sea);border-radius:2px}
+@media (max-width:600px){#lmap{height:min(460px,62vh)}}
+.leaflet-container{font:400 12px/1.4 var(--mono);background:var(--sea)}
+.arc-canvas{position:absolute;left:0;top:0;pointer-events:none;transition:opacity .15s}
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:500 13px/1.4 var(--mono);color:var(--muted);background:color-mix(in srgb,var(--panel) 80%,transparent);z-index:900;pointer-events:none}
+.where{position:absolute;left:8px;bottom:30px;z-index:800;background:color-mix(in srgb,var(--card) 92%,transparent);border:1px solid var(--border);border-radius:3px;font:500 11px/1.3 var(--mono);color:var(--fg);padding:5px 8px;pointer-events:none;max-width:60%}
+.where:empty{display:none}
+.lyrBtn{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;font:600 12px/1 var(--mono);padding:8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.lyrBtn[aria-expanded="true"]{background:var(--fg);color:var(--bg)}
+.lyrPanel{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 12px 8px;margin-top:6px;width:240px;box-shadow:0 2px 10px rgba(0,0,0,.15);font:400 12px/1.3 var(--mono)}
+.lyrPanel[hidden]{display:none}
+.lyrPanel .row{margin:0 0 9px}
+.lyrPanel label{display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:600}
+.lyrPanel input[type=range]{width:100%;accent-color:var(--fg)}
+.lyrPanel select{font:400 12px var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:2px;padding:2px 4px;width:100%;min-height:26px}
+.lyrPanel .sub{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px;margin-top:3px}
+.lyrPanel .sub span{flex:0 0 58px}
+.lyrPanel .reset{font:400 11px var(--mono);color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.town{font:500 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg);pointer-events:none}
+.town i{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--fg);margin-right:4px;vertical-align:1px}
+.town.r3{font-weight:600;font-size:12px}
+.town.r0,.town.r1{font-weight:400;font-size:10.5px}
+.sat .town{color:#fff;text-shadow:0 0 3px #000,0 0 3px #000}
+.sat .town i{background:#fff}
+.leaflet-tooltip{font:400 12px/1.4 var(--mono);background:var(--fg);color:var(--bg);border:0;border-radius:3px;box-shadow:none}
+.leaflet-tooltip:before{display:none}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--card);color:var(--fg);border-bottom-color:var(--border)}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--fg)}
+#card .big{font:800 26px/1.1 var(--display);margin:2px 0 4px;text-wrap:balance}
+#card .sub{color:var(--muted);font-size:12px;margin:0 0 8px}
+.plist{list-style:none;margin:6px 0 0;padding:0}
+.plist li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:5px 2px;border-bottom:1px solid var(--rule);cursor:pointer}
+.plist li:hover{background:var(--panel)}
+.plist li i{width:10px;height:10px;border-radius:50%;display:inline-block;transform:translateY(1px)}
+.plist li b{font-weight:500}
+.plist li small{color:var(--muted);font-size:11.5px}
+.plist li em{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap}
+.tag{display:inline-block;font:500 10px/1 var(--mono);padding:3px 5px;border-radius:2px;background:var(--accent);color:#fff;margin-left:4px;vertical-align:1px}
+.minibars{margin:4px 0 6px}
+.minibars div{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:6px;align-items:end;font-size:12px;margin:0 0 5px}
+.minibars p{margin:0}
+.minibars span{display:block;height:7px;border-radius:2px;background:var(--accent2);margin-top:2px}
+.minibars b{font-weight:500;text-align:right}
+.pull{font:600 26px/1.25 var(--display);border-left:6px solid var(--accent);padding:4px 0 4px 18px;margin:30px 0}
+.note{background:var(--panel);border:1px solid var(--rule);padding:14px 16px;font-size:16px;margin:22px 0}
+.note h3{margin-top:0}
+.warn{font:400 12px/1.45 var(--mono);color:var(--muted);border-left:3px solid var(--accent);padding-left:8px;margin:8px 0}
+table.t{width:100%;border-collapse:collapse;font:400 13px/1.35 var(--mono)}
+table.t th{text-align:left;font-weight:500;color:var(--muted);border-bottom:2px solid var(--fg);padding:6px 8px 6px 0}
+table.t td{border-bottom:1px solid var(--rule);padding:7px 8px 7px 0;vertical-align:top}
+table.t td.num,table.t th.num{text-align:right;white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.xgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:760px){.xgrid{grid-template-columns:minmax(0,1fr)}}
+details{margin:14px 0}
+summary{font:500 13px/1.4 var(--mono);cursor:pointer;color:var(--fg);padding:8px 0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.cta a{font:500 13px/1 var(--mono);text-decoration:none;border:1px solid var(--fg);padding:11px 14px;border-radius:3px}
+.cta a.p{background:var(--accent);border-color:var(--accent);color:#fff}
+footer{border-top:6px double var(--fg);margin-top:56px;padding-top:16px;font:400 13px/1.55 var(--mono);color:var(--muted)}
+footer p{margin:0 0 10px}
+.theme{position:fixed;right:12px;bottom:12px;z-index:1002}
+@media print{.theme,.ctlrow{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker"><b>Data study</b><span>Twin towns and sister cities</span><span>The world, 1945 to 2026</span></div>
+<header class="hero">
+  <h1>Who is your town <em>twinned</em> with?</h1>
+  <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M60 4a56 56 0 0 1 0 112M60 4a56 56 0 0 0 0 112M8 44h104M8 76h104" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".35"/><path d="M26 78 Q60 18 94 62" fill="none" stroke="#1F5FAD" stroke-width="3.5" stroke-linecap="round"/><path d="M26 78 Q52 52 78 92" fill="none" stroke="#E8A100" stroke-width="3.5" stroke-linecap="round"/><path d="M94 62 Q86 82 78 92" fill="none" stroke="#D7263D" stroke-width="3.5" stroke-linecap="round"/><circle cx="26" cy="78" r="6" fill="currentColor"/><circle cx="94" cy="62" r="5" fill="#1F5FAD"/><circle cx="78" cy="92" r="5" fill="#D7263D"/></svg>
+  <p class="dek">Drive into almost any town in Europe and a sign tells you its twins. I drew every twin town and sister city link recorded on Wikidata, 29,437 of them between 19,976 places, as arcs on one map. The web shows a continent making peace after 1945, links across the Iron Curtain, a rush when the Wall fell, Japan and China reaching out, and the links cut after Russia invaded Ukraine.</p>
+</header>
+<div class="byline">Dr Tristan Hotham, Independent researcher · 2026 · Data: Wikidata (CC0); English Wikipedia lists (CC BY-SA 4.0) as a check; Natural Earth</div>
+
+<div class="stats">
+  <div><b style="color:var(--accent2)">29,437</b><span>twinnings between 19,976 places in 208 countries and territories</span></div>
+  <div><b style="color:#D7263D">1990</b><span>the busiest year: 298 new links with a start date</span></div>
+  <div><b style="color:#12A39A">1,442</b><span>French and German pairs, the most common pair of countries</span></div>
+  <div><b style="color:var(--accent)">90</b><span>links with Russian or Belarusian towns recorded as ended since 2022</span></div>
+</div>
+
+<p class="lede">Twinning is one of the quieter success stories of the last eighty years. Two councils sign a charter, exchange visits, name a street or a roundabout after each other, and send school parties and brass bands back and forth. Few people could name their own town's twins, yet together these small agreements form a dense web across the world. I wanted to see that web whole: who is linked to whom, when the links were made, and how far they reach.</p>
+<p>Wikidata, the open database behind Wikipedia, records twinnings with a single property ("twinned administrative body"). I took every one of its 55,634 statements, turned them into 29,437 unique pairs of places, and placed each place by its coordinates. About 35% of pairs carry a start date, so the timing stories below rest on that dated third. The map works best as a way to explore your own town: search for it, and its partners light up.</p>
+
+<h2 class="bleed"><span class="n">01 · The map</span>Every twinning, as an arc</h2>
+<div class="bleed">
+<div class="ctlrow"><div class="searchbox"><input type="search" id="q" placeholder="Search a town or a country, e.g. Coventry, Kyoto, Poland" autocomplete="off" aria-label="Search a town or a country" aria-autocomplete="list" aria-controls="sug"><ul class="suggest" id="sug" role="listbox"></ul></div><button class="btn" id="clear">Show all</button></div>
+<div class="ctlrow scroll"><span class="ctl-l">Colour by</span><div class="seg" id="mode"><button class="btn" data-m="era" aria-pressed="true">When it began</button><button class="btn" data-m="cont">Continents</button></div><span class="ctl-l" style="margin-left:8px">Show</span><div class="seg" id="scope"><button class="btn" data-s="all" aria-pressed="true">All</button><button class="btn" data-s="ew">East and West</button><button class="btn" data-s="ns">Namesakes</button><button class="btn" data-s="end">Ended</button></div></div>
+<div class="ctlrow scroll" id="legend" aria-label="Legend: tap to show or hide"></div>
+<div class="mapgrid">
+  <div class="mapbox" id="mapbox"><div id="lmap" role="application" aria-label="World map of twin town links"></div><div class="where" id="where"></div><div class="loading" id="loading">Loading the map…</div></div>
+  <aside class="side" id="side">
+    <h4 id="cardH">Pick a town</h4>
+    <div id="card"><p class="sub">Tap or click a town on the map, or search for one. Each arc joins two twinned places; colour shows when the link began (or which continents it joins). Tap the legend to hide a group. Faint arcs are the whole web; the chosen town's links are drawn bold.</p></div>
+  </aside>
+</div>
+<p class="src" id="mapNote"></p>
+</div>
+
+<h2><span class="n">02 · When</span>A post-war idea that peaked in 1990</h2>
+<div class="figure"><p class="fig-h">New twinnings by start year</p><p class="fig-sub">Pairs with a start date on Wikidata (10,292 of 29,437), 1945 to 2026, coloured as on the map</p><div class="chart" id="cYears"></div></div>
+<p>A handful of links in the data are dated before the Second World War, but the habit really starts in its aftermath. Only 75 dated pairs began before 1950. The 1950s added 257, the 1960s 675, the 1970s 765, and then the numbers took off: 1,375 in the 1980s and 2,558 in the 1990s. The single busiest year is 1990, with 298 new dated links, the year after the Berlin Wall fell. Since then the pace has eased but not stopped: 1,921 in the 2010s and 322 so far in the 2020s. Of all dated twinnings, 69% began in 1990 or later.</p>
+<p class="warn">Start dates are missing for most pairs, and the gaps are uneven: Taiwan has a date for 69% of its links, Switzerland for 14%. The shape of the curve is more reliable than its height.</p>
+
+<h2><span class="n">03 · Reconciliation</span>France and Germany, and Coventry</h2>
+<p>The most common pair of countries in the whole web is France and Germany, with 1,442 town pairs, more than any country has with itself. Of those with a date, the peak decade is the 1960s (152 pairs), and the median start year is 1974. Links involving a French town made up 42% of all new dated twinnings in the 1950s, and links involving a German town 43% in the 1960s; both shares then slid as the rest of the world joined in.</p>
+<div class="figure"><p class="fig-h">Share of each decade's new twinnings</p><p class="fig-sub">Dated pairs only; each line is the share of that decade's new links that join the two countries named</p><div class="chart" id="cPairs"></div></div>
+<p>Britain followed the same path on a smaller scale. Of the 1,619 links that involve a UK place, 34% are with France and 24% with Germany; the median start year of the dated ones is 1984. The most-twinned UK places in the data are London (33), Coventry (26) and Sherborne (25).</p>
+<p>Coventry's list reads like a history lesson. Its earliest dated link is with Volgograd in 1944, then Lidice in 1947, and by 1963 it had added Warsaw, Belgrade, Sarajevo, Ostrava, Caen, Graz, Dresden and Kiel, among others. Several were behind the Iron Curtain, and one was Dresden, the German city whose wartime bombing is so often remembered alongside Coventry's own.</p>
+<div class="pull">France and Germany share 1,442 twinnings, more than any other two countries.</div>
+
+<h2><span class="n">04 · Across the Iron Curtain</span>Links between East and West</h2>
+<p>To look at the Cold War I split places into two camps by their present country: an Eastern bloc (the Warsaw Pact members and the former Soviet republics, plus the five eastern German states) and a West (NATO members as of 1989, the western half of Germany, and the neutral states Austria, Finland, Ireland, Sweden and Switzerland). Of the dated pairs that began before 1990, 15% (469) crossed that line. In the 1990s the share nearly doubled, to 28%, as towns in Poland (167 dated links in the 1990s), eastern Germany (122), Russia (97) and Hungary (86) signed up with partners in the West.</p>
+<p>Before 1990 the busiest Western partner was France (101 dated links), then West Germany (97) and Finland (81), a small neutral country with a long border with the Soviet Union.</p>
+<div class="figure"><p class="fig-h">East and West German towns, by year twinned</p><p class="fig-sub">Pairs with one town in the five eastern German states and one in the west (Berlin left out), dated pairs only</p><div class="chart" id="cGerman"></div></div>
+<p>The most striking case is inside Germany itself. Of the 771 pairs of German towns on Wikidata, 654 join a town in the former East with one in the former West. Most have no date, but of the 117 that do, 36 began before 1990: one is dated 1984, then Saarlouis with Eisenhüttenstadt and Bremen with Rostock in 1986, and a run of others from 1987 to 1989. Another 52 were made in 1990 alone, the year of reunification.</p>
+
+<h2><span class="n">05 · Going global</span>Further apart, and the rise of Asia</h2>
+<div class="figure"><p class="fig-h">How far twins reach</p><p class="fig-sub">Dated pairs by decade: share of new links between different continents, with the share within Europe; hover for the median distance between partners</p><div class="chart" id="cDist"></div></div>
+<p>The first twinnings were neighbours. Of the pairs dated to the 1950s, only 14% crossed between continents, and the median distance was 776 km. By the 1980s, 44% were intercontinental and the median distance was 1,775 km. Across the whole web the median twin lives 1,009 km away; the longest link, Taipei to Asunción, spans 19,929 km.</p>
+<p>East Asia was a big part of that reach. Japan has 1,751 twinnings, 288 of them with the United States and 491 between Japanese towns. Its share of new dated links peaked in the 1980s at 21%. China arrived later: it has 1,712 twinnings, led by Japan (232), the United States (146) and Russia (113), and its median start year is 2004. Chinese towns took part in 12% of new dated links in the 1980s and 17% in the 2010s.</p>
+<div class="figure"><p class="fig-h">Japan and China: share of each decade's new twinnings</p><p class="fig-sub">Dated pairs that include at least one place in the country</p><div class="chart" id="cAsia"></div></div>
+
+<h2><span class="n">06 · The champions</span>The most-twinned places</h2>
+<div class="xgrid">
+<div class="figure"><p class="fig-h">Most partners on Wikidata</p><p class="fig-sub">Places by number of twinnings</p><div class="chart" id="cTop"></div></div>
+<div class="figure"><p class="fig-h">Most common pairs of countries</p><p class="fig-sub">Twinnings by the two countries they join</p><div class="chart" id="cCP"></div></div>
+</div>
+<p>Most places are modest twinners: the median place in the data has 1 partner, and 54% have just one. A few collect them. Rio de Janeiro leads with 122, then Saint Petersburg (118), Shanghai (86), Kyiv (86) and Moscow (80). Bethlehem, recorded on Wikidata with about 36,000 people, has 64: more than London (33), Berlin (32) or Paris (24). Only 303 places have twenty or more.</p>
+
+<h2><span class="n">07 · Namesakes</span>Boston and Boston, Perth and Perth</h2>
+<p>Some towns twin with their own name. I counted 130 pairs where both places have the same name in different countries, most often between the United Kingdom and the United States (20 pairs), the old namesakes of colonial settlement. The UK list includes Boston, Cambridge, Christchurch, Perth (twice, with Australia and Canada), Plymouth, Portsmouth, Salisbury, Stafford and Worcester, and Coventry, which is twinned with three American Coventries. The most repeated namesake of all is Trujillo: the four Trujillos in Spain, Peru, Venezuela and Honduras are all twinned with one another, 6 pairs in all. Choose "Namesakes" above the map to see them all.</p>
+
+<h2><span class="n">08 · 2022</span>The links that were cut</h2>
+<p>After Russia's full-scale invasion of Ukraine in February 2022, many councils suspended or ended their links with Russian and Belarusian towns. Wikidata records an end date for 254 twinnings in all. Of the 115 that ended in 2022 or later, 90 involve a Russian (80) or Belarusian (10) place. The partner towns were most often in Poland (29), Lithuania (15) and Finland (12).</p>
+<div class="figure"><p class="fig-h">Russian and Belarusian twinnings recorded as ended since 2022</p><p class="fig-sub">By the partner's country, from Wikidata end dates</p><div class="chart" id="cEnded"></div></div>
+<p class="warn">This is surely an undercount. Wikidata only records an end when an editor adds one, and 1,650 Russian twinnings have no end date at all. Treat these 90 as a documented minimum, not a count.</p>
+
+<h2><span class="n">09 · Checking</span>How complete is the web?</h2>
+<p>English Wikipedia keeps its own lists of twin towns, country by country, written separately from Wikidata. I read all 85 list pages (34,971 partner lines; most pairs appear twice, once in each country's list) and looked for each pair on Wikidata by name. 56% of the lines matched a Wikidata pair; for 74%, both towns were in the Wikidata twinning data under the same name, even if not as a pair. Name matching misses some real matches (spelling, "Municipality" suffixes, districts), so the true overlap is higher, but the gap is real: Wikidata is a large sample of the world's twinnings, not a census.</p>
+<div class="figure"><p class="fig-h">Share of Wikipedia list lines found on Wikidata, by list page</p><p class="fig-sub">Pages with 150 or more partner lines; matched by place names</p><div class="chart" id="cWP"></div></div>
+
+<div class="note">
+<h3>Method and caveats</h3>
+<p><b>Data.</b> Every Wikidata statement of property P190 ("twinned administrative body"), with its start time (P580) and end time (P582) qualifiers where given, retrieved on 2026-10-29 through the QLever SPARQL endpoint. Statements are made by one place about another; I merged both directions into one undirected pair (87% of pairs are stated on both sides). Where the two sides give different start years (263 pairs) I use the earlier one. 4 start dates before 1900 or in the future are treated as missing.</p>
+<p><b>Places.</b> Each place is placed by its Wikidata coordinates and given a present-day country by testing that point against Natural Earth country outlines (9 fell outside every outline and kept their Wikidata country). Entries with no coordinates (109), whole countries (31), and schools, parks and similar bodies (42) are left out, with the 283 pairs that touch them. Some places appear twice on Wikidata (a town and its municipality), and regions and provinces with their own partnerships are kept.</p>
+<p><b>Groups.</b> Continents follow Natural Earth (Russia counts as Europe, Turkey as Asia). East and West use present-day countries as a stand-in for Cold War camps, so a twinning between, say, Lviv and a Polish town counts as East with East. Namesakes are pairs whose names match after removing accents and words such as "Municipality" or "City of".</p>
+<p><b>Coverage.</b> Wikidata is edited by volunteers and coverage differs a lot by country. Most links have no start date. The map shows what is recorded, not every twinning that exists or ever existed.</p>
+</div>
+
+<div class="cta"><a class="p" href="https://doi.org/10.5281/zenodo.23763153">Read the paper</a><a href="https://github.com/Tristan-Hotham/twin-towns">Data and code</a><a href="https://blog.tristanhotham.com/2026/10/29/twin-towns/">Blog post</a></div>
+
+<details><summary>Sources and licences</summary>
+<p class="src">Twinnings, places, coordinates, populations and start and end dates: Wikidata (https://www.wikidata.org), property P190 with qualifiers P580 and P582, queried through QLever (https://qlever.cs.uni-freiburg.de) on 2026-10-29; CC0 1.0. German states and UK nations: Wikidata P131. Coverage check: English Wikipedia, the 85 pages titled "List of twin towns and sister cities in ..." (revision ids in the data files), CC BY-SA 4.0. Country outlines and continents: Natural Earth 1:50m (public domain). Place names on the map: GeoNames cities15000 (CC BY 4.0). Hill shading: AWS Terrain Tiles (Mapzen terrarium). Optional base maps: Tiles © Esri.</p>
+</details>
+
+<footer>
+  <p>Dr Tristan Hotham, Independent researcher. ORCID 0000-0003-4931-9349. Cite as: Hotham, T. (2026) Who is your town twinned with? The world's web of twin towns and sister cities from Wikidata. https://doi.org/10.5281/zenodo.23763153</p>
+  <p>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</p>
+  <p>Text, figures and derived data: CC BY 4.0 (Wikidata is CC0; the Wikipedia coverage check is summarised, not republished). Code: MIT. Other studies: <a href="https://maps.tristanhotham.com/study-abroad/">Where would you go to university?</a>, <a href="https://maps.tristanhotham.com/country-names/">What the world calls each other</a>, <a href="https://blog.tristanhotham.com/">all posts</a>.</p>
+</footer>
+</div>
+<div class="tip" id="tip"></div>
+<button class="btn theme" id="theme" aria-label="Toggle dark mode">◐</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+"use strict";
+const R = {"meta":{"retrieved":"2026-10-29","statements":55634,"items":20179,"places":19976,"pairs":29437,"excluded":{"a whole country":31,"no coordinates":109,"not a place (school, park, organisation)":42},"pairs_dropped":283,"countries":208,"both_sides":25734,"both_sides_share":0.8742,"start_years_differ":263},"dates":{"n_dated":10292,"share_dated":0.3496,"n_odd":4,"median_year":1997,"first_year":1900,"by_year":{"1900":1,"1918":1,"1919":1,"1930":1,"1939":1,"1940":8,"1943":1,"1944":1,"1945":3,"1946":13,"1947":18,"1948":18,"1949":8,"1950":12,"1951":9,"1952":7,"1953":13,"1954":14,"1955":27,"1956":41,"1957":35,"1958":49,"1959":50,"1960":49,"1961":52,"1962":66,"1963":61,"1964":66,"1965":77,"1966":72,"1967":75,"1968":74,"1969":83,"1970":69,"1971":64,"1972":70,"1973":79,"1974":73,"1975":81,"1976":68,"1977":68,"1978":83,"1979":110,"1980":107,"1981":93,"1982":111,"1983":103,"1984":121,"1985":123,"1986":132,"1987":166,"1988":190,"1989":229,"1990":298,"1991":253,"1992":284,"1993":264,"1994":217,"1995":198,"1996":242,"1997":285,"1998":297,"1999":220,"2000":257,"2001":230,"2002":204,"2003":213,"2004":262,"2005":229,"2006":249,"2007":238,"2008":242,"2009":220,"2010":228,"2011":277,"2012":210,"2013":214,"2014":184,"2015":187,"2016":181,"2017":173,"2018":157,"2019":110,"2020":43,"2021":53,"2022":97,"2023":74,"2024":34,"2025":19,"2026":2},"by_decade":{"1900":1,"1910":2,"1930":2,"1940":70,"1950":257,"1960":675,"1970":765,"1980":1375,"1990":2558,"2000":2344,"2010":1921,"2020":322},"peak_year":1990,"peak_year_n":298,"share_1990s_or_later":0.6942,"share_before_1970":0.0978,"earliest":[["Túrkeve","Hungary","Salonta","Romania",1900],["Vincennes","France","Vincennes","United States",1918],["Fontenay sous Bois","France","Trucy","France",1919],["Wiesbaden","Germany","Klagenfurt am Wörthersee","Austria",1930],["Rakhiv","Ukraine","Szeged","Hungary",1939],["Lappeenranta","Finland","Örebro Municipality","Sweden",1940],["Lahti","Finland","Västerås Municipality","Sweden",1940],["Skellefteå Municipality","Sweden","Raahe","Finland",1940]],"by_country":[["TWN","Taiwan",211,0.692],["GEO","Georgia",279,0.656],["JPN","Japan",1751,0.639],["BLR","Belarus",360,0.619],["CHN","China",1712,0.606],["UKR","Ukraine",1141,0.566],["CYP","Cyprus",175,0.549],["CAN","Canada",451,0.541],["RUS","Russia",1757,0.538],["KOR","South Korea",427,0.525],["LTU","Lithuania",487,0.522],["MDA","Moldova",301,0.495],["PSE","Palestine",242,0.471],["LVA","Latvia",355,0.442],["AUS","Australia",262,0.431],["MKD","North Macedonia",208,0.418],["ISR","Israel",520,0.413],["TUR","Turkey",892,0.399],["POL","Poland",2342,0.397],["BIH","Bosnia and Herzegovina",212,0.396],["BGR","Bulgaria",572,0.395],["USA","United States",2756,0.369],["FIN","Finland",899,0.365],["IRL","Ireland",222,0.365],["FRA","France",5300,0.348],["GRC","Greece",610,0.341],["GBR","United Kingdom",1619,0.34],["BEL","Belgium",639,0.336],["PRT","Portugal",602,0.324],["PER","Peru",190,0.321],["BRA","Brazil",585,0.316],["PHL","Philippines",178,0.315],["SVN","Slovenia",280,0.314],["DEU","Germany",6017,0.31],["HRV","Croatia",341,0.308],["HUN","Hungary",1554,0.308],["DNK","Denmark",574,0.307],["MAR","Morocco",284,0.303],["SRB","Serbia",449,0.298],["EST","Estonia",307,0.293],["ROU","Romania",1110,0.293],["SVK","Slovakia",634,0.289],["MEX","Mexico",790,0.278],["AUT","Austria",615,0.276],["ARG","Argentina",375,0.261],["NLD","Netherlands",475,0.259],["CZE","Czechia",835,0.254],["ESP","Spain",1595,0.227],["SWE","Sweden",880,0.214],["NOR","Norway",424,0.182],["ITA","Italy",3947,0.164],["ISL","Iceland",178,0.157],["CHL","Chile",172,0.145],["CHE","Switzerland",461,0.143]],"first_main":1945,"last_main":2026},"distance":{"median_km":1009,"under_1000_share":0.497,"over_5000_share":0.216,"by_decade":{"1940":{"n":70,"median_km":746,"intercontinental":0.043,"europe_only":0.957},"1950":{"n":257,"median_km":776,"intercontinental":0.14,"europe_only":0.844},"1960":{"n":675,"median_km":811,"intercontinental":0.23,"europe_only":0.72},"1970":{"n":765,"median_km":1022,"intercontinental":0.314,"europe_only":0.591},"1980":{"n":1375,"median_km":1775,"intercontinental":0.438,"europe_only":0.408},"1990":{"n":2558,"median_km":1344,"intercontinental":0.383,"europe_only":0.501},"2000":{"n":2344,"median_km":1386,"intercontinental":0.363,"europe_only":0.502},"2010":{"n":1921,"median_km":1587,"intercontinental":0.439,"europe_only":0.378},"2020":{"n":322,"median_km":1340,"intercontinental":0.332,"europe_only":0.531}},"longest":[["Taipei","Taiwan","Asunción","Paraguay",19929],["Rosario","Argentina","Shanghai","China",19739],["Bahía Blanca","Argentina","Dalian","China",19679],["Montevideo","Uruguay","Daejeon","South Korea",19654],["Nago","Japan","Londrina","Brazil",19640]]},"pairs_story":{"FRA_DEU":{"total":1442,"dated":477,"by_decade":{"1950":[31,0.1206],"1960":[152,0.2252],"1970":[107,0.1399],"1980":[83,0.0604],"1990":[59,0.0231],"2000":[26,0.0111],"2010":[14,0.0073],"2020":[5,0.0155]},"median_year":1974,"peak_decade":1960},"FRA_GBR":{"total":551,"dated":205,"by_decade":{"1950":[25,0.0973],"1960":[32,0.0474],"1970":[36,0.0471],"1980":[34,0.0247],"1990":[52,0.0203],"2000":[16,0.0068],"2010":[6,0.0031],"2020":[1,0.0031]},"median_year":1981,"peak_decade":1990},"DEU_GBR":{"total":389,"dated":132,"by_decade":{"1950":[27,0.1051],"1960":[26,0.0385],"1970":[24,0.0314],"1980":[25,0.0182],"1990":[15,0.0059],"2000":[4,0.0017],"2010":[2,0.001],"2020":[2,0.0062]},"median_year":1971,"peak_decade":1950},"DEU_POL":{"total":536,"dated":151,"by_decade":{"1950":[2,0.0078],"1960":[1,0.0015],"1970":[11,0.0144],"1980":[14,0.0102],"1990":[74,0.0289],"2000":[43,0.0183],"2010":[6,0.0031],"2020":[0,0.0]},"median_year":1995,"peak_decade":1990},"JPN_USA":{"total":288,"dated":163,"by_decade":{"1950":[13,0.0506],"1960":[28,0.0415],"1970":[16,0.0209],"1980":[33,0.024],"1990":[48,0.0188],"2000":[18,0.0077],"2010":[7,0.0036],"2020":[0,0.0]},"median_year":1988,"peak_decade":1990},"CHN_USA":{"total":146,"dated":77,"by_decade":{"1950":[0,0.0],"1960":[0,0.0],"1970":[1,0.0013],"1980":[21,0.0153],"1990":[16,0.0063],"2000":[14,0.006],"2010":[23,0.012],"2020":[2,0.0062]},"median_year":2001,"peak_decade":2010},"CHN_JPN":{"total":232,"dated":137,"by_decade":{"1950":[0,0.0],"1960":[0,0.0],"1970":[9,0.0118],"1980":[58,0.0422],"1990":[41,0.016],"2000":[19,0.0081],"2010":[10,0.0052],"2020":[0,0.0]},"median_year":1990,"peak_decade":1980},"POL_UKR":{"total":286,"dated":157,"by_decade":{"1950":[0,0.0],"1960":[0,0.0],"1970":[0,0.0],"1980":[0,0.0],"1990":[22,0.0086],"2000":[69,0.0294],"2010":[53,0.0276],"2020":[13,0.0404]},"median_year":2007,"peak_decade":2000}},"country_story":{"CHN":{"total":1712,"dated":1037,"share_dated":0.606,"by_decade":{"1950":[0,0.0],"1960":[1,0.0015],"1970":[14,0.0183],"1980":[165,0.12],"1990":[233,0.0911],"2000":[275,0.1173],"2010":[323,0.1681],"2020":[26,0.0807]},"median_year":2004,"top_partners":[["JPN","Japan",232],["USA","United States",146],["RUS","Russia",113],["KOR","South Korea",82],["DEU","Germany",71],["CAN","Canada",56]]},"JPN":{"total":1751,"dated":1118,"share_dated":0.638,"by_decade":{"1950":[18,0.07],"1960":[72,0.1067],"1970":[122,0.1595],"1980":[291,0.2116],"1990":[289,0.113],"2000":[179,0.0764],"2010":[142,0.0739],"2020":[5,0.0155]},"median_year":1991,"top_partners":[["JPN","Japan",491],["USA","United States",288],["CHN","China",232],["KOR","South Korea",88],["CAN","Canada",76],["DEU","Germany",65]]},"USA":{"total":2756,"dated":1016,"share_dated":0.369,"by_decade":{"1950":[25,0.0973],"1960":[76,0.1126],"1970":[96,0.1255],"1980":[192,0.1396],"1990":[294,0.1149],"2000":[177,0.0755],"2010":[140,0.0729],"2020":[12,0.0373]},"median_year":1992,"top_partners":[["JPN","Japan",288],["MEX","Mexico",212],["DEU","Germany",182],["ITA","Italy",159],["CHN","China",146],["FRA","France",136]]},"KOR":{"total":427,"dated":224,"share_dated":0.525,"by_decade":{"1950":[0,0.0],"1960":[6,0.0089],"1970":[10,0.0131],"1980":[22,0.016],"1990":[72,0.0281],"2000":[66,0.0282],"2010":[46,0.0239],"2020":[2,0.0062]},"median_year":2000,"top_partners":[["JPN","Japan",88],["CHN","China",82],["USA","United States",49],["RUS","Russia",22],["KOR","South Korea",15],["TUR","Turkey",11]]},"FRA":{"total":5300,"dated":1844,"share_dated":0.348,"by_decade":{"1950":[107,0.4163],"1960":[280,0.4148],"1970":[246,0.3216],"1980":[308,0.224],"1990":[425,0.1661],"2000":[287,0.1224],"2010":[152,0.0791],"2020":[33,0.1025]},"median_year":1989,"top_partners":[["DEU","Germany",1442],["ITA","Italy",739],["GBR","United Kingdom",551],["ESP","Spain",362],["POL","Poland",176],["BEL","Belgium",152]]},"DEU":{"total":6017,"dated":1863,"share_dated":0.31,"by_decade":{"1950":[97,0.3774],"1960":[289,0.4281],"1970":[260,0.3399],"1980":[321,0.2335],"1990":[492,0.1923],"2000":[234,0.0998],"2010":[118,0.0614],"2020":[42,0.1304]},"median_year":1989,"top_partners":[["FRA","France",1442],["DEU","Germany",771],["POL","Poland",536],["ITA","Italy",445],["GBR","United Kingdom",389],["HUN","Hungary",237]]},"GBR":{"total":1619,"dated":549,"share_dated":0.339,"by_decade":{"1950":[65,0.2529],"1960":[78,0.1156],"1970":[74,0.0967],"1980":[98,0.0713],"1990":[121,0.0473],"2000":[63,0.0269],"2010":[28,0.0146],"2020":[8,0.0248]},"median_year":1984,"top_partners":[["FRA","France",551],["DEU","Germany",389],["USA","United States",87],["ITA","Italy",67],["POL","Poland",45],["CHN","China",40]]},"RUS":{"total":1757,"dated":944,"share_dated":0.537,"by_decade":{"1950":[13,0.0506],"1960":[40,0.0593],"1970":[39,0.051],"1980":[59,0.0429],"1990":[242,0.0946],"2000":[310,0.1323],"2010":[222,0.1156],"2020":[17,0.0528]},"median_year":2002,"top_partners":[["RUS","Russia",180],["BLR","Belarus",118],["DEU","Germany",113],["CHN","China",113],["USA","United States",106],["FIN","Finland",93]]},"UKR":{"total":1141,"dated":646,"share_dated":0.566,"by_decade":{"1950":[8,0.0311],"1960":[11,0.0163],"1970":[12,0.0157],"1980":[17,0.0124],"1990":[117,0.0457],"2000":[189,0.0806],"2010":[194,0.101],"2020":[97,0.3012]},"median_year":2008,"top_partners":[["POL","Poland",286],["RUS","Russia",66],["DEU","Germany",59],["HUN","Hungary",58],["UKR","Ukraine",53],["LTU","Lithuania",46]]},"POL":{"total":2342,"dated":930,"share_dated":0.397,"by_decade":{"1950":[5,0.0195],"1960":[9,0.0133],"1970":[34,0.0444],"1980":[43,0.0313],"1990":[320,0.1251],"2000":[321,0.1369],"2010":[171,0.089],"2020":[27,0.0839]},"median_year":2001,"top_partners":[["DEU","Germany",536],["UKR","Ukraine",286],["FRA","France",176],["ITA","Italy",132],["HUN","Hungary",131],["CZE","Czechia",116]]},"TUR":{"total":892,"dated":356,"share_dated":0.399,"by_decade":{"1950":[0,0.0],"1960":[4,0.0059],"1970":[7,0.0092],"1980":[18,0.0131],"1990":[63,0.0246],"2000":[87,0.0371],"2010":[148,0.077],"2020":[29,0.0901]},"median_year":2009,"top_partners":[["DEU","Germany",82],["TUR","Turkey",63],["BGR","Bulgaria",45],["RUS","Russia",41],["BIH","Bosnia and Herzegovina",32],["ITA","Italy",31]]},"ITA":{"total":3947,"dated":649,"share_dated":0.164,"by_decade":{"1950":[22,0.0856],"1960":[74,0.1096],"1970":[48,0.0627],"1980":[79,0.0575],"1990":[112,0.0438],"2000":[201,0.0858],"2010":[97,0.0505],"2020":[16,0.0497]},"median_year":1998,"top_partners":[["FRA","France",739],["ITA","Italy",532],["DEU","Germany",445],["ESP","Spain",175],["USA","United States",159],["POL","Poland",132]]}},"inner_german":{"n":654,"dated":117,"before_1990":36,"in_1990":52,"y1989":7,"first":[["Lindau","Anhalt-Bitterfeld",1984],["Bremen","Rostock",1986],["Saarlouis","Eisenhüttenstadt",1986],["Erlangen","Jena",1987]],"by_year":{"1984":1,"1986":2,"1987":12,"1988":14,"1989":7,"1990":52,"1991":15,"1992":5,"1993":2,"1995":2,"1996":2,"1997":1,"2007":1,"2010":1},"share_of_domestic_de":0.848,"domestic_de":771},"top_places":[["Rio de Janeiro","Brazil",122],["Saint Petersburg","Russia",118],["Shanghai","China",86],["Kyiv","Ukraine",86],["Moscow","Russia",80],["Istanbul","Turkey",73],["Beijing","China",70],["Buenos Aires","Argentina",70],["Mexico City","Mexico",64],["Bethlehem","Palestine",64],["Vilnius","Lithuania",61],["Guadalajara","Mexico",58],["Kaliningrad","Russia",58],["Taipei","Taiwan",56],["São Paulo","Brazil",53],["Lublin","Poland",53],["Suzhou","China",52],["Athens","Greece",52],["Minsk","Belarus",50],["Madrid","Spain",49],["Florence","Italy",49],["Manila","Philippines",48],["Odesa","Ukraine",48],["Tirana","Albania",46],["Barcelona","Spain",45],["Prague","Czechia",45],["Monterrey","Mexico",45],["Sarajevo","Bosnia and Herzegovina",45],["Chengdu","China",44],["Amman","Jordan",44]],"country_pairs":[["DEU","FRA","Germany","France",1442],["DEU","DEU","Germany","Germany",771],["FRA","ITA","France","Italy",739],["FRA","GBR","France","United Kingdom",551],["DEU","POL","Germany","Poland",536],["ITA","ITA","Italy","Italy",532],["JPN","JPN","Japan","Japan",491],["DEU","ITA","Germany","Italy",445],["DEU","GBR","Germany","United Kingdom",389],["ESP","FRA","Spain","France",362],["JPN","USA","Japan","United States",288],["POL","UKR","Poland","Ukraine",286],["HUN","ROU","Hungary","Romania",274],["DEU","HUN","Germany","Hungary",237],["CHN","JPN","China","Japan",232],["MEX","USA","Mexico","United States",212],["AUT","DEU","Austria","Germany",185],["DEU","USA","Germany","United States",182],["RUS","RUS","Russia","Russia",180],["FRA","POL","France","Poland",176],["ESP","ITA","Spain","Italy",175],["CZE","DEU","Czechia","Germany",169],["FIN","SWE","Finland","Sweden",167],["ESP","ESP","Spain","Spain",164],["MEX","MEX","Mexico","Mexico",161],["ITA","USA","Italy","United States",159],["BEL","FRA","Belgium","France",152],["CHN","USA","China","United States",146],["FRA","USA","France","United States",136],["FRA","FRA","France","France",134],["MDA","ROU","Moldova","Romania",134],["ITA","POL","Italy","Poland",132],["FRA","PRT","France","Portugal",131],["HUN","POL","Hungary","Poland",131],["HUN","SVK","Hungary","Slovakia",127],["BEL","DEU","Belgium","Germany",119],["BLR","RUS","Belarus","Russia",118],["DNK","SWE","Denmark","Sweden",116],["CZE","POL","Czechia","Poland",116],["DEU","RUS","Germany","Russia",113]],"ended":{"n":254,"since_2022":115,"since_2022_rus_blr":90,"rus_blr_share_of_2022":0.783,"rus":80,"blr":10,"by_country":[["POL","Poland",29],["LTU","Lithuania",15],["FIN","Finland",12],["UKR","Ukraine",7],["USA","United States",5],["CZE","Czechia",5],["DEU","Germany",4],["GBR","United Kingdom",3],["EST","Estonia",3],["NLD","Netherlands",2]],"by_year":{"2022":86,"2023":4},"rus_blr_pairs_total":2117,"rus_still_open":1650,"examples":[["Arkhangelsk","Russia","Oulu","Finland",2022],["Baranavichy","Belarus","Novovolynsk","Ukraine",2022],["Białystok","Poland","Tomsk","Russia",2022],["Charlotte","United States","Voronezh","Russia",2022],["Cheb","Czechia","Nizhny Tagil","Russia",2022],["Cheltenham","United Kingdom","Sochi","Russia",2022],["Cherepovets","Russia","Montclair","United States",2022],["Chernihiv","Ukraine","Gomel","Belarus",2022],["Chicago","United States","Moscow","Russia",2022],["Druskininkai","Lithuania","Dzerzhinsk","Russia",2022],["Düsseldorf","Germany","Moscow","Russia",2022],["Elbląg","Poland","Kaliningrad","Russia",2022]]},"wikipedia_check":{"pages":85,"lines":34971,"matched":19763,"match_share":0.565,"both_names_known":25844,"both_names_share":0.739,"lowest":[["Estonia",303,0.323],["Belarus",401,0.329],["Slovenia",333,0.348],["Australia",312,0.356],["North America",340,0.382],["Mexico",596,0.393]],"highest":[["Spain",794,0.688],["Switzerland",313,0.693],["Finland",664,0.724],["Israel",377,0.764],["France",2363,0.769],["Italy",1117,0.795]],"per_page":[["Estonia",303,0.323],["Belarus",401,0.329],["Slovenia",333,0.348],["Australia",312,0.356],["North America",340,0.382],["Mexico",596,0.393],["South Korea",469,0.397],["the Czech Republic",1472,0.421],["Croatia",409,0.433],["Bosnia and Herzegovina",249,0.434],["Nicaragua",152,0.447],["the Republic of Ireland",336,0.452],["Austria",730,0.468],["Turkey",800,0.47],["Portugal",700,0.477],["Latvia",390,0.482],["Slovakia",917,0.484],["Belgium",686,0.494],["Lithuania",535,0.495],["Palestine",186,0.5],["South America",428,0.507],["Brazil",439,0.517],["the Netherlands",289,0.529],["Scotland",189,0.534],["Bulgaria",534,0.547],["Serbia",341,0.557],["China",1411,0.561],["Greece",312,0.564],["Japan",1066,0.564],["Moldova",181,0.575],["Sweden",655,0.58],["Hungary",1639,0.589],["Canada",350,0.591],["Argentina",193,0.596],["Poland",2232,0.598],["England",1221,0.612],["Denmark",354,0.621],["Taiwan",238,0.622],["Ukraine",938,0.626],["Africa",512,0.635],["Romania",875,0.638],["Russia",897,0.643],["Georgia (country)",188,0.644],["Norway",265,0.645],["North Macedonia",170,0.647],["Asia",434,0.654],["Spain",794,0.688],["Switzerland",313,0.693],["Finland",664,0.724],["Israel",377,0.764],["France",2363,0.769],["Italy",1117,0.795]]},"cold_war":{"ew_total":5276,"ew_dated":1869,"ew_before_1990":469,"ew_1990_on":1400,"ew_1990_1999":727,"by_decade":{"1950":[36,0.1401],"1960":[91,0.1348],"1970":[103,0.1346],"1980":[237,0.1724],"1990":[727,0.2842],"2000":[421,0.1796],"2010":[195,0.1015],"2020":[57,0.177]},"share_of_dated_before_1990":0.149,"share_of_dated_1990s":0.2842,"west_before_1990":[["FRA","France",101],["DEU","Germany",97],["FIN","Finland",81],["USA","United States",33],["ITA","Italy",33],["GBR","United Kingdom",27]],"east_before_1990":[["DEU","Germany",108],["RUS","Russia",96],["POL","Poland",60],["HUN","Hungary",41],["UKR","Ukraine",32],["CZE","Czechia",23]],"east_1990s":[["POL","Poland",167],["DEU","Germany",122],["RUS","Russia",97],["HUN","Hungary",86],["ROU","Romania",38],["EST","Estonia",38]]}};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = n => Math.round(n).toLocaleString("en-GB");
+const pct = x => Math.round(x * 100) + "%";
+const isDark = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+const tip = $("tip");
+function showTip(h, x, y) { tip.innerHTML = h; tip.style.display = "block"; const w = tip.offsetWidth; x = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)); tip.style.left = x + scrollX + "px"; tip.style.top = y + scrollY + "px"; }
+function hideTip() { tip.style.display = "none"; }
+const redraws = [];
+function resp(box, render) { let last = 0; const go = force => { const w = Math.max(280, Math.round(box.clientWidth)); if (!force && Math.abs(w - last) < 4) return; last = w; box.innerHTML = ""; render(w, w < 560); }; new ResizeObserver(() => go()).observe(box); go(); redraws.push(() => go(true)); }
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(w, h) { const s = document.createElementNS(SVGNS, "svg"); s.setAttribute("viewBox", `0 0 ${w} ${h}`); s.setAttribute("role", "img"); return s; }
+function el(p, tag, a, txt) { const e = document.createElementNS(SVGNS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; }
+(function () { const k = "tt_theme"; let t = null; try { t = localStorage.getItem(k); } catch (e) {} if (t) document.documentElement.dataset.theme = t;
+  $("theme").onclick = () => { const d = isDark() ? "light" : "dark"; document.documentElement.dataset.theme = d; try { localStorage.setItem(k, d); } catch (e) {} redraws.forEach(f => f()); if (window.mapRestyle) mapRestyle(); }; })();
+
+/* ===== colour classes (one table for map, legend and charts) ===== */
+const ERA = [
+  { k: "Before 1960", c: "#3B3B98", d: "#8C8CF0", t: y => y > 0 && y < 1960 },
+  { k: "1960s", c: "#1F78B4", d: "#5DB3F5", t: y => y >= 1960 && y < 1970 },
+  { k: "1970s", c: "#12A39A", d: "#3FE0D3", t: y => y >= 1970 && y < 1980 },
+  { k: "1980s", c: "#5E9E2E", d: "#93DB5A", t: y => y >= 1980 && y < 1990 },
+  { k: "1990s", c: "#D99A00", d: "#FFC933", t: y => y >= 1990 && y < 2000 },
+  { k: "2000s", c: "#E8661A", d: "#FF9447", t: y => y >= 2000 && y < 2010 },
+  { k: "2010 on", c: "#D7263D", d: "#FF5A6E", t: y => y >= 2010 },
+  { k: "No date", c: "#9A948A", d: "#77727F", t: y => !y }];
+const CPAIR = [
+  { k: "Within Europe", c: "#1F5FAD", d: "#6FA8FF" },
+  { k: "Europe and Asia", c: "#C2185B", d: "#FF5C93" },
+  { k: "Europe and the Americas", c: "#E8661A", d: "#FF9447" },
+  { k: "Within Asia", c: "#7B3FB0", d: "#C08BF5" },
+  { k: "Asia and the Americas", c: "#12A39A", d: "#3FE0D3" },
+  { k: "Within the Americas", c: "#5E9E2E", d: "#93DB5A" },
+  { k: "Africa", c: "#9C5B2E", d: "#E0A170" },
+  { k: "Oceania", c: "#0091C9", d: "#4CC7F5" }];
+function eraOf(y) { for (let i = 0; i < ERA.length; i++) if (ERA[i].t(y)) return i; return ERA.length - 1; }
+function cpairOf(a, b) { // continents: 0 Europe 1 Asia 2 N America 3 S America 4 Africa 5 Oceania
+  if (a === 4 || b === 4) return 6; if (a === 5 || b === 5) return 7;
+  const am = x => x === 2 || x === 3;
+  if (a === 0 && b === 0) return 0; if (a === 1 && b === 1) return 3; if (am(a) && am(b)) return 5;
+  if ((a === 0 && b === 1) || (a === 1 && b === 0)) return 1; if (a === 0 || b === 0) return 2; return 4; }
+const colOf = (tbl, i) => isDark() ? tbl[i].d : tbl[i].c;
+
+let D = null, CJ = null, TOWNS = null, lmap = null;
+const S = { mode: "era", scope: "all", on: { era: ERA.map(() => true), cont: CPAIR.map(() => true) }, place: -1, country: -1 };
+let NP = 0, NE = 0, PL = null, PR = null, CLS = null, ADJ = null, PX = null, PY = null, ARC = null, AOFF = null, ABB = null;
+
+/* ===== small chart helpers ===== */
+function niceTicks(m) { const p = Math.pow(10, Math.floor(Math.log10(m))), n = m / p, st = (n > 5 ? 2 : n > 2 ? 1 : .5) * p; const t = []; for (let v = 0; v <= m + 1e-9; v += st) t.push(v); return t; }
+function short(v) { return v >= 1e6 ? (v / 1e6).toFixed(v % 1e6 ? 1 : 0) + "m" : v >= 1e3 ? (v / 1e3).toFixed(v % 1e3 ? 1 : 0) + "k" : String(Math.round(v * 100) / 100); }
+function lineChart(box, series, opt = {}) {
+  resp(box, (W, narrow) => {
+    const H = opt.h || (narrow ? 250 : 290), L = 46, Rr = narrow ? 104 : 150, T = 12, B = 26;
+    const xs = series.flatMap(s => s.pts.map(p => p[0])), ys = series.flatMap(s => s.pts.map(p => p[1]));
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y1 = opt.ymax || Math.max(...ys) * 1.08 || 1;
+    const X = x => L + (W - L - Rr) * (x - x0) / Math.max(1, x1 - x0), Y = y => T + (H - T - B) * (1 - y / y1);
+    const s = svg(W, H);
+    const ticks = opt.pct ? niceTicks(y1).filter(t => t <= y1) : niceTicks(y1);
+    for (const t of ticks) { el(s, "line", { x1: L, x2: W - Rr, y1: Y(t), y2: Y(t), stroke: css("--rule") }); el(s, "text", { x: L - 6, y: Y(t) + 4, "text-anchor": "end", class: "lab s m" }, opt.pct ? Math.round(t * 100) + "%" : short(t)); }
+    for (const x of [...new Set(xs)]) if (!narrow || x % 20 === 0 || xs.length < 10) el(s, "text", { x: X(x), y: H - 6, "text-anchor": "middle", class: "lab s m" }, opt.xlab ? opt.xlab(x) : x);
+    const labs = [];
+    for (const se of series) {
+      const d = se.pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join("");
+      el(s, "path", { d, fill: "none", stroke: se.col, "stroke-width": se.w || 2.6, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": se.dash || "" });
+      for (const p of se.pts) el(s, "circle", { cx: X(p[0]), cy: Y(p[1]), r: 2.8, fill: se.col });
+      const lp = se.pts[se.pts.length - 1]; labs.push({ y: Y(lp[1]), x: X(lp[0]), t: se.name, c: se.col });
+    }
+    labs.sort((a, b) => a.y - b.y); for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 14) labs[i].y = labs[i - 1].y + 14;
+    const over = labs.length ? labs[labs.length - 1].y - (H - B - 4) : 0; if (over > 0) labs.forEach(l => l.y -= over);
+    for (const l of labs) el(s, "text", { x: l.x + 8, y: l.y + 4, class: "lab b", style: `fill:${l.c}` }, l.t);
+    const hov = el(s, "rect", { x: L, y: T, width: W - L - Rr, height: H - T - B, fill: "transparent" });
+    hov.addEventListener("mousemove", e => { const r = s.getBoundingClientRect(), xr = x0 + (x1 - x0) * ((e.clientX - r.left) * W / r.width - L) / (W - L - Rr); const xv = [...new Set(xs)].reduce((a, b) => Math.abs(b - xr) < Math.abs(a - xr) ? b : a); const rows = series.map(se => { const p = se.pts.find(q => q[0] === xv); return p ? `<span style="color:${se.col}">■</span> ${esc(se.name)}: ${opt.pct ? pct(p[1]) : fmt(p[1])}${p[2] != null ? " · " + p[2] : ""}` : null; }).filter(Boolean); showTip(`<b>${opt.xlab ? opt.xlab(xv) : xv}</b><br>${rows.join("<br>")}`, e.pageX - scrollX, e.pageY - scrollY); });
+    hov.addEventListener("mouseleave", hideTip);
+    box.appendChild(s);
+  });
+}
+function hbars(box, rows, opt = {}) {
+  resp(box, (W, narrow) => {
+    const lw = narrow ? 128 : (opt.lw || 168), rh = 23, H = rows.length * rh + 6, max = opt.max || Math.max(1, ...rows.map(r => r[1]));
+    const s = svg(W, H), lim = opt.lim || (narrow ? 17 : 24);
+    rows.forEach((r, i) => {
+      const y = i * rh + 3, w = Math.max(1, (W - lw - 56) * r[1] / max);
+      el(s, "text", { x: lw - 6, y: y + 14, "text-anchor": "end", class: "lab" }, r[0].length > lim ? r[0].slice(0, lim - 1) + "." : r[0]);
+      el(s, "rect", { x: lw, y: y + 2, width: w, height: rh - 7, fill: r[2] || css("--accent2"), rx: 2 });
+      el(s, "text", { x: lw + w + 5, y: y + 14, class: "lab m" }, opt.pct ? pct(r[1]) : fmt(r[1]));
+    });
+    box.appendChild(s);
+  });
+}
+function yearBars(box) {
+  resp(box, (W, narrow) => {
+    const H = narrow ? 230 : 280, L = 40, Rr = 10, T = 14, B = 26, y0 = 1945, y1 = R.dates.last_main;
+    const by = R.dates.by_year, max = Math.max(...Object.values(by)) * 1.06;
+    const bw = (W - L - Rr) / (y1 - y0 + 1), X = y => L + (y - y0) * bw, Y = v => T + (H - T - B) * (1 - v / max);
+    const s = svg(W, H);
+    for (const t of niceTicks(max)) { el(s, "line", { x1: L, x2: W - Rr, y1: Y(t), y2: Y(t), stroke: css("--rule") }); el(s, "text", { x: L - 6, y: Y(t) + 4, "text-anchor": "end", class: "lab s m" }, short(t)); }
+    for (let y = y0; y <= y1; y++) { const v = by[y] || 0; if (!v) continue; const r = el(s, "rect", { x: X(y) + .5, y: Y(v), width: Math.max(1, bw - 1), height: Y(0) - Y(v), fill: colOf(ERA, eraOf(y)) }); r.addEventListener("mousemove", e => showTip(`<b>${y}</b><br>${fmt(v)} new dated twinnings`, e.pageX - scrollX, e.pageY - scrollY)); r.addEventListener("mouseleave", hideTip); }
+    for (let y = 1950; y <= y1; y += narrow ? 20 : 10) el(s, "text", { x: X(y) + bw / 2, y: H - 6, "text-anchor": "middle", class: "lab s m" }, y);
+    const py = R.dates.peak_year; el(s, "text", { x: X(py) - 4, y: Y(by[py]) - 4, "text-anchor": "end", class: "lab b" }, `${py}: ${fmt(by[py])}`);
+    box.appendChild(s);
+  });
+}
+function storyCharts() {
+  yearBars($("cYears"));
+  const decs = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020], dl = x => x + "s";
+  const ser = (o, name, col) => ({ name, col, pts: decs.map(d => [d, o.by_decade[d][1], fmt(o.by_decade[d][0]) + " pairs"]) });
+  lineChart($("cPairs"), [ser(R.pairs_story.FRA_DEU, "France and Germany", "#1F5FAD"), ser(R.pairs_story.FRA_GBR, "France and UK", "#D7263D"), ser(R.pairs_story.DEU_GBR, "Germany and UK", "#E8A100"), ser(R.pairs_story.DEU_POL, "Germany and Poland", "#12A39A")], { pct: true, xlab: dl });
+  lineChart($("cAsia"), [ser(R.country_story.JPN, "Japan", "#C2185B"), ser(R.country_story.CHN, "China", "#D99A00"), ser(R.country_story.USA, "United States", "#1F5FAD")], { pct: true, xlab: dl });
+  const bd = R.distance.by_decade;
+  lineChart($("cDist"), [{ name: "Intercontinental", col: "#C2185B", pts: decs.map(d => [d, bd[d].intercontinental, fmt(bd[d].median_km) + " km median"]) }, { name: "Within Europe", col: "#1F5FAD", pts: decs.map(d => [d, bd[d].europe_only, fmt(bd[d].n) + " pairs"]) }], { pct: true, xlab: dl, ymax: 1 });
+  const ig = R.inner_german.by_year, iy = Object.keys(ig).map(Number).filter(y => y <= 1997);
+  hbars($("cGerman"), iy.map(y => [String(y), ig[y], y < 1990 ? "#1F5FAD" : y === 1990 ? "#D7263D" : "#9A948A"]), { lw: 60 });
+  hbars($("cTop"), R.top_places.slice(0, 15).map(r => [r[0], r[2]]));
+  const SN = n => ({ "United Kingdom": "UK", "United States": "US" }[n] || n);
+  hbars($("cCP"), R.country_pairs.slice(0, 15).map(r => [r[0] === r[1] ? "within " + SN(r[2]) : SN(r[2]) + " and " + SN(r[3]), r[4]]), { lw: 170, lim: 22 });
+  hbars($("cEnded"), R.ended.by_country.slice(0, 10).map(r => [r[1], r[2], "#C2185B"]));
+  hbars($("cWP"), R.wikipedia_check.per_page.slice().reverse().filter((r, i, a) => i < 8 || i >= a.length - 8).map(r => [r[0], r[2]]), { pct: true, max: 1, lw: 190 });
+}
+
+/* ===== map data ===== */
+const W0 = 256, D2R = Math.PI / 180;
+function proj(lat, lon) { const s = Math.sin(Math.max(-85, Math.min(85, lat)) * D2R); return [W0 * (lon + 180) / 360, W0 * (.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI))]; }
+function gc(la1, lo1, la2, lo2, n) { // great-circle points by spherical interpolation
+  const p1 = la1 * D2R, l1 = lo1 * D2R, p2 = la2 * D2R, l2 = lo2 * D2R;
+  const a = [Math.cos(p1) * Math.cos(l1), Math.cos(p1) * Math.sin(l1), Math.sin(p1)], b = [Math.cos(p2) * Math.cos(l2), Math.cos(p2) * Math.sin(l2), Math.sin(p2)];
+  const w = Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))), out = [];
+  for (let i = 0; i <= n; i++) { const t = i / n; let k1 = 1 - t, k2 = t; if (w > 1e-6) { k1 = Math.sin((1 - t) * w) / Math.sin(w); k2 = Math.sin(t * w) / Math.sin(w); }
+    const x = k1 * a[0] + k2 * b[0], y = k1 * a[1] + k2 * b[1], z = k1 * a[2] + k2 * b[2]; out.push([Math.atan2(z, Math.hypot(x, y)) / D2R, Math.atan2(y, x) / D2R]); }
+  return out; }
+function buildGeometry() {
+  NP = D.places.length; NE = D.pairs.length / 5;
+  PX = new Float32Array(NP); PY = new Float32Array(NP);
+  D.places.forEach((p, i) => { const q = proj(p[1], p[2]); PX[i] = q[0]; PY[i] = q[1]; });
+  CLS = new Uint8Array(NE * 2); ADJ = Array.from({ length: NP }, () => []);
+  const pts = [], off = new Uint32Array(NE + 1); ABB = new Float32Array(NE * 4);
+  for (let e = 0; e < NE; e++) {
+    const a = D.pairs[e * 5], b = D.pairs[e * 5 + 1], s = D.pairs[e * 5 + 2];
+    ADJ[a].push(e); ADJ[b].push(e);
+    CLS[e * 2] = eraOf(s); CLS[e * 2 + 1] = cpairOf(D.cont[D.places[a][3]], D.cont[D.places[b][3]]);
+    // west to east so every arc bows to the same side (north on screen)
+    let A = D.places[a], B = D.places[b]; if (A[2] > B[2]) [A, B] = [B, A];
+    const dx0 = PX[0], seg = gc(A[1], A[2], B[1], B[2], 2);
+    const len = Math.hypot(proj(A[1], A[2])[0] - proj(B[1], B[2])[0], proj(A[1], A[2])[1] - proj(B[1], B[2])[1]);
+    const n = Math.max(4, Math.min(48, Math.round(Math.min(len, 180) / 2.2)));
+    const g = gc(A[1], A[2], B[1], B[2], n);
+    let px = [], py = [], prev = null;
+    for (const [la, lo] of g) { let [x, y] = proj(la, lo); if (prev != null) { while (x - prev > W0 / 2) x -= W0; while (prev - x > W0 / 2) x += W0; } prev = x; px.push(x); py.push(y); }
+    const cx = px[n] - px[0], cy = py[n] - py[0], L = Math.hypot(cx, cy) || 1, nx = cy / L, ny = -cx / L, bow = L * (.16 - .1 * Math.min(1, L / 120));
+    let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;
+    for (let i = 0; i <= n; i++) { const t = i / n, k = bow * Math.sin(Math.PI * t), x = px[i] + nx * k * (ny > 0 ? -1 : 1), y = py[i] + ny * k * (ny > 0 ? -1 : 1);
+      pts.push(x, y); if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y; }
+    off[e + 1] = pts.length; ABB.set([minx, miny, maxx, maxy], e * 4);
+  }
+  ARC = new Float32Array(pts); AOFF = off;
+}
+/* which links count as visible under the current scope and legend */
+function scopeOk(e) {
+  const f = D.pairs[e * 5 + 4];
+  if (S.scope === "ew") return (f & 2) > 0; if (S.scope === "ns") return (f & 4) > 0; if (S.scope === "end") return D.pairs[e * 5 + 3] > 0; return true; }
+const clsOf = e => S.mode === "era" ? CLS[e * 2] : CLS[e * 2 + 1];
+const isOn = e => S.on[S.mode][clsOf(e)] && scopeOk(e);
+function focusSet() {
+  if (S.place >= 0) return new Set(ADJ[S.place]);
+  if (S.country >= 0) { const s = new Set(); for (let e = 0; e < NE; e++) if (D.places[D.pairs[e * 5]][3] === S.country || D.places[D.pairs[e * 5 + 1]][3] === S.country) s.add(e); return s; }
+  return null; }
+
+/* ===== canvas layer for arcs and town dots ===== */
+const LY = { base: "plain", hills: true, hillK: 45, names: true, nameLvl: 0, lines: true, lineK: 40, colour: 70, dots: true };
+const LYDEF = { ...LY };
+try { Object.assign(LY, JSON.parse(localStorage.getItem("tt_layers") || "{}")); } catch (e) {}
+const saveLY = () => { try { localStorage.setItem("tt_layers", JSON.stringify(LY)); } catch (e) {} };
+let tiles = {}, landL = null, borderL = null, hillL = null, hillCv = null, HILLIMG = null, nameL = null, arcL = null, FOCUS = null;
+const WORLD = window.L ? L.latLngBounds([-85.0511, -180], [85.0511, 180]) : null;
+const CanvasOverlay = window.L ? L.ImageOverlay.extend({ _initImage() { const c = this._image = this._url; L.DomUtil.addClass(c, "leaflet-image-layer"); if (this._zoomAnimated) L.DomUtil.addClass(c, "leaflet-zoom-animated"); c.onselectstart = L.Util.falseFn; c.onmousemove = L.Util.falseFn; } }) : null;
+const ArcLayer = window.L ? L.Layer.extend({
+  onAdd(map) { this._c = L.DomUtil.create("canvas", "arc-canvas"); map.getPane("arcs").appendChild(this._c); map.on("moveend zoomend resize viewreset", this.redraw, this); map.on("zoomstart", this._hide, this); this.redraw(); },
+  onRemove(map) { this._c.remove(); map.off("moveend zoomend resize viewreset", this.redraw, this); map.off("zoomstart", this._hide, this); },
+  _hide() { this._c.style.opacity = 0; },
+  redraw() { if (!this._map || !ARC) return; const m = this._map, sz = m.getSize(), tl = m.containerPointToLayerPoint([0, 0]), c = this._c, dpr = Math.min(2, devicePixelRatio || 1);
+    L.DomUtil.setPosition(c, tl); c.width = sz.x * dpr; c.height = sz.y * dpr; c.style.width = sz.x + "px"; c.style.height = sz.y + "px";
+    const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const z = m.getZoom(), k = Math.pow(2, z), po = m.getPixelOrigin(), ox = po.x + tl.x, oy = po.y + tl.y;
+    drawAll(g, sz.x, sz.y, k, ox, oy, z); c.style.opacity = 1; }
+}) : null;
+function drawAll(g, w, h, k, ox, oy, z) {
+  const dark = isDark() || LY.base === "dark" || LY.base === "satellite", tbl = S.mode === "era" ? ERA : CPAIR, F = FOCUS, strength = LY.colour / 100;
+  const vx0 = ox / k - 2, vx1 = (ox + w) / k + 2, vy0 = oy / k - 2, vy1 = (oy + h) / k + 2;
+  const shifts = [0, -W0, W0];
+  const path = (e, sh) => { const o0 = AOFF[e], o1 = AOFF[e + 1]; g.moveTo((ARC[o0] + sh) * k - ox, ARC[o0 + 1] * k - oy); for (let o = o0 + 2; o < o1; o += 2) g.lineTo((ARC[o] + sh) * k - ox, ARC[o + 1] * k - oy); };
+  const vis = (e, sh) => !(ABB[e * 4 + 2] + sh < vx0 || ABB[e * 4] + sh > vx1 || ABB[e * 4 + 3] < vy0 || ABB[e * 4 + 1] > vy1);
+  // background web: one stroke per colour class, faint; drawn additively on dark grounds so crossings glow
+  const zf = Math.max(0, Math.min(1, (z - 1.5) / 4));
+  const zfade = z > 5 ? Math.max(.35, 1 - (z - 5) * .22) : 1;
+  const baseA = (F ? .035 : ((dark ? .16 : .11) + .1 * zf) * zfade) * (.35 + strength), lw = .55 + .4 * zf;
+  g.globalCompositeOperation = dark ? "lighter" : "source-over"; g.lineCap = "round"; g.lineJoin = "round";
+  for (let ci = tbl.length - 1; ci >= 0; ci--) {
+    if (!S.on[S.mode][ci]) continue;
+    g.beginPath(); let any = false;
+    for (let e = 0; e < NE; e++) { if (clsOf(e) !== ci || !scopeOk(e)) continue; for (const sh of shifts) if (vis(e, sh)) { path(e, sh); any = true; } }
+    if (!any) continue;
+    g.strokeStyle = colOf(tbl, ci); g.globalAlpha = Math.min(1, ci === ERA.length - 1 && S.mode === "era" ? baseA * .8 : baseA); g.lineWidth = lw; g.stroke();
+  }
+  g.globalCompositeOperation = "source-over";
+  // town dots
+  if (LY.dots) {
+    const minDeg = dotMin(z), vp = visPlaces();
+    g.globalAlpha = F ? .35 : .7; g.fillStyle = dark ? "#F2EEE6" : css("--dot"); g.strokeStyle = dark ? "#000" : "#fff"; g.lineWidth = .8;
+    for (let i = 0; i < NP; i++) { const dg = D.places[i][4]; if (dg < minDeg || !vp[i]) continue; const x = PX[i] * k - ox, y = PY[i] * k - oy; if (x < -5 || y < -5 || x > w + 5 || y > h + 5) continue;
+      const r = Math.min(5.5, (z >= 6 ? 1.6 : 1.1) + Math.sqrt(dg) * .38); g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill(); if (r > 2.6) g.stroke(); }
+  }
+  if (!F) { g.globalAlpha = 1; return; }
+  // focus: bold arcs in their colour, partner dots and names
+  const list = [...F].filter(isOn);
+  const many = list.length > 200, fw = many ? .9 : list.length > 60 ? 1.5 : 2.1;
+  g.globalAlpha = many ? .5 : .95;
+  const ordc = S.mode === "era" ? [ERA.length - 1, ...ERA.keys()].slice(0, ERA.length) : [...CPAIR.keys()];
+  for (const ci of ordc) {
+    g.beginPath(); let any = false;
+    for (const e of list) { if (clsOf(e) !== ci) continue; for (const sh of shifts) if (vis(e, sh)) { path(e, sh); any = true; } }
+    if (any) { if (!many) { g.strokeStyle = dark ? "rgba(0,0,0,.6)" : "rgba(255,255,255,.85)"; g.lineWidth = fw + 2.2; g.stroke(); } g.strokeStyle = colOf(tbl, ci); g.lineWidth = fw; g.stroke(); }
+  }
+  const ends = new Map();
+  for (const e of list) { const a = D.pairs[e * 5], b = D.pairs[e * 5 + 1]; for (const p of [a, b]) if (p !== S.place) ends.set(p, e); }
+  const boxes = [], fs = 11.5; g.font = `500 ${fs}px "IBM Plex Mono", monospace`; g.textBaseline = "middle";
+  const order = [...ends.keys()].sort((p, q) => D.places[q][4] - D.places[p][4]);
+  const cx0 = S.place >= 0 ? PX[S.place] : null;
+  for (const p of order) {
+    const shs = cx0 == null ? shifts : [[0, -W0, W0].reduce((a, b) => Math.abs(PX[p] + b - cx0) < Math.abs(PX[p] + a - cx0) ? b : a)];
+    for (const sh of shs) { const x = (PX[p] + sh) * k - ox, y = PY[p] * k - oy; if (x < -10 || y < -10 || x > w + 10 || y > h + 10) continue;
+      g.globalAlpha = 1; g.beginPath(); g.arc(x, y, many ? 2.6 : 3.6, 0, 6.2832); g.fillStyle = colOf(tbl, clsOf(ends.get(p))); g.fill(); g.lineWidth = 1.4; g.strokeStyle = dark ? "#000" : "#fff"; g.stroke();
+      if (S.place >= 0 && list.length <= 160) { const t = D.places[p][0], tw = g.measureText(t).width, bx = [x + 5, y - 8, x + 9 + tw, y + 8];
+        if (bx[2] > w - 2 || boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue; boxes.push(bx);
+        g.lineWidth = 3.5; g.strokeStyle = dark ? "rgba(0,0,0,.85)" : "rgba(255,255,255,.92)"; g.strokeText(t, x + 7, y); g.fillStyle = dark ? "#F2EEE6" : "#1F1B24"; g.fillText(t, x + 7, y); } }
+  }
+  if (S.place >= 0) for (const sh of shifts) { const x = (PX[S.place] + sh) * k - ox, y = PY[S.place] * k - oy; if (x < -20 || x > w + 20) continue;
+    g.beginPath(); g.arc(x, y, 7.5, 0, 6.2832); g.fillStyle = dark ? "#F2EEE6" : "#1F1B24"; g.fill(); g.lineWidth = 2.5; g.strokeStyle = dark ? "#000" : "#fff"; g.stroke();
+    const t = D.places[S.place][0]; g.font = `700 13.5px "IBM Plex Mono", monospace`; g.lineWidth = 4; g.strokeText(t, x + 11, y - 1); g.fillStyle = dark ? "#fff" : "#000"; g.fillText(t, x + 11, y - 1); }
+  g.globalAlpha = 1;
+}
+function redrawArcs() { VP = null; if (arcL) arcL.redraw(); if (lmap) lmap.getPane("names").style.opacity = FOCUS ? .55 : 1; }
+let VP = null;
+function visPlaces() { if (VP) return VP; VP = new Uint8Array(NP); for (let e = 0; e < NE; e++) if (isOn(e)) { VP[D.pairs[e * 5]] = 1; VP[D.pairs[e * 5 + 1]] = 1; } return VP; }
+const dotMin = z => !LY.dots ? 1e9 : z >= 6 ? 1 : z >= 5 ? 3 : z >= 4 ? 8 : z >= 3 ? 16 : 30;
+
+/* ===== layers (hills, names, borders, base) ===== */
+function composeHills() {
+  if (!HILLIMG) return;
+  const k = LY.hillK / 100, dark = isDark() || LY.base === "dark", n = HILLIMG.width;
+  const g = hillCv.getContext("2d"), out = g.createImageData(n, HILLIMG.height), s = HILLIMG.data, d = out.data;
+  const sh = dark ? [0, 0, 0] : [44, 36, 52];
+  for (let i = 0; i < s.length; i += 4) { const a = s[i] / 255, h = s[i + 1] / 255;
+    if (a >= h * .6) { d[i] = sh[0]; d[i + 1] = sh[1]; d[i + 2] = sh[2]; d[i + 3] = Math.min(255, a * 255 * k * (dark ? 1.1 : .9)); }
+    else { d[i] = 255; d[i + 1] = 255; d[i + 2] = 255; d[i + 3] = h * 255 * k * (dark ? .25 : .6); } }
+  g.putImageData(out, 0, 0);
+}
+function loadHills() {
+  if (HILLIMG) return Promise.resolve();
+  return new Promise((ok, bad) => { const im = new Image(); im.onload = () => { const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0); HILLIMG = x.getImageData(0, 0, c.width, c.height); hillCv.width = c.width; hillCv.height = c.height; ok(); }; im.onerror = bad; im.src = "data/hills.png"; });
+}
+function placeNames() {
+  if (!nameL) return; nameL.clearLayers(); if (!LY.names || !TOWNS) return;
+  const z = lmap.getZoom(), bb = lmap.getBounds().pad(.05), lvl = LY.nameLvl;
+  const minR = lvl === 0 ? (z >= 6 ? 1 : z >= 5 ? 2 : 3) : lvl === 1 ? (z >= 6 ? 0 : z >= 5 ? 1 : z >= 4 ? 2 : 3) : (z >= 4 ? 0 : z >= 3 ? 1 : 2);
+  const boxes = [], cap = lvl === 2 ? 420 : 240; let n = 0;
+  for (const t of TOWNS) {
+    if (t[3] < minR || !bb.contains([t[2], t[1]])) continue;
+    const p = lmap.latLngToContainerPoint([t[2], t[1]]), fs = t[3] >= 3 ? 12 : 11;
+    const bx = [p.x - 4, p.y - 8, p.x + 10 + t[0].length * fs * .6, p.y + 7];
+    if (boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue;
+    boxes.push(bx);
+    L.marker([t[2], t[1]], { pane: "names", interactive: false, keyboard: false, icon: L.divIcon({ className: "town r" + t[3], html: `<i></i>${esc(t[0])}`, iconSize: null, iconAnchor: [3, 6] }) }).addTo(nameL);
+    if (++n >= cap) break;
+  }
+}
+function styleLand() {
+  if (!landL) return; const plain = LY.base === "plain";
+  landL.setStyle(f => ({ stroke: false, fillColor: css("--land"), fillOpacity: plain ? 1 : 0, interactive: true }));
+}
+function applyLayers() {
+  for (const k in tiles) { if (k === LY.base) tiles[k].addTo(lmap); else tiles[k].remove(); }
+  lmap.getContainer().classList.toggle("sat", LY.base === "satellite");
+  lmap.getContainer().style.background = LY.base === "plain" ? css("--sea") : (LY.base === "dark" ? "#2b2b2b" : LY.base === "satellite" ? "#0b1a26" : "#e8e8e8");
+  styleLand();
+  if (LY.hills) { loadHills().then(() => { composeHills(); hillL.addTo(lmap); }).catch(() => {}); } else hillL.remove();
+  if (LY.lines) { borderL.addTo(lmap); borderL.setStyle({ color: LY.base === "satellite" || LY.base === "dark" || isDark() ? "#f2eee6" : css("--line"), opacity: .15 + .85 * LY.lineK / 100, weight: .4 + LY.lineK / 100 }); } else borderL.remove();
+  if (LY.names) nameL.addTo(lmap); else nameL.remove();
+  placeNames(); redrawArcs();
+}
+function initLayers() {
+  const Ctl = L.Control.extend({ options: { position: "topright" }, onAdd() {
+    const d = L.DomUtil.create("div"); L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.innerHTML = `<button class="lyrBtn" aria-expanded="false" aria-controls="lyrPanel">Map layers</button>
+<div class="lyrPanel" id="lyrPanel" hidden>
+ <div class="row"><label for="lyBase" style="font-weight:600">Base map</label><div class="sub"><select id="lyBase" aria-label="Base map"><option value="plain">Plain paper (offline)</option><option value="light">Light grey (Esri)</option><option value="dark">Dark grey (Esri)</option><option value="satellite">Satellite (Esri)</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyHills"> Hills and mountains</label><div class="sub"><span>strength</span><input type="range" id="lyHillK" min="10" max="100" step="5" aria-label="Hill shading strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lyNames"> Place names</label><div class="sub"><span>how many</span><select id="lyNameLvl" aria-label="How many place names"><option value="0">Big cities only</option><option value="1">Cities and towns</option><option value="2">Lots</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyLines"> Borders and coasts</label><div class="sub"><span>strength</span><input type="range" id="lyLineK" min="10" max="100" step="5" aria-label="Border line strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lyDots"> Twinned towns as dots</label></div>
+ <div class="row"><label style="font-weight:600">Links</label><div class="sub"><span>strength</span><input type="range" id="lyColour" min="10" max="100" step="5" aria-label="Link strength"></div></div>
+ <button class="reset" id="lyReset">Reset layers</button>
+</div>`;
+    return d; } });
+  lmap.addControl(new Ctl());
+  const q = $, btn = lmap.getContainer().querySelector(".lyrBtn"), pan = q("lyrPanel");
+  btn.onclick = () => { const o = pan.hidden; pan.hidden = !o; btn.setAttribute("aria-expanded", o); };
+  const sync = () => { q("lyBase").value = LY.base; q("lyHills").checked = LY.hills; q("lyHillK").value = LY.hillK; q("lyNames").checked = LY.names; q("lyNameLvl").value = LY.nameLvl; q("lyLines").checked = LY.lines; q("lyLineK").value = LY.lineK; q("lyColour").value = LY.colour; q("lyDots").checked = LY.dots; };
+  const on = (id, ev, f) => q(id).addEventListener(ev, e => { f(e.target); saveLY(); applyLayers(); });
+  on("lyBase", "change", t => { LY.base = t.value; if (t.value === "satellite") { LY.hills = false; q("lyHills").checked = false; } });
+  on("lyHills", "change", t => LY.hills = t.checked); on("lyHillK", "input", t => { LY.hillK = +t.value; LY.hills = true; q("lyHills").checked = true; });
+  on("lyNames", "change", t => LY.names = t.checked); on("lyNameLvl", "change", t => { LY.nameLvl = +t.value; LY.names = true; q("lyNames").checked = true; });
+  on("lyLines", "change", t => LY.lines = t.checked); on("lyLineK", "input", t => { LY.lineK = +t.value; LY.lines = true; q("lyLines").checked = true; });
+  on("lyDots", "change", t => LY.dots = t.checked); on("lyColour", "input", t => LY.colour = +t.value);
+  q("lyReset").onclick = () => { Object.assign(LY, LYDEF); saveLY(); sync(); applyLayers(); };
+  sync();
+  lmap.on("zoomend moveend", () => { placeNames(); whereAmI(); });
+}
+window.mapRestyle = () => { if (!lmap) return; legend(); applyLayers(); };
+
+/* "where am I": the country under the map centre and the nearest big town, shown when zoomed in */
+function whereAmI() {
+  const z = lmap.getZoom(); if (z < 4 || !TOWNS) { $("where").textContent = ""; return; }
+  const c = lmap.getCenter(); let best = null, bd = 1e9;
+  for (const t of TOWNS) { if (t[3] < 2) continue; const d = (t[2] - c.lat) ** 2 + ((t[1] - c.lng) * Math.cos(c.lat * D2R)) ** 2; if (d < bd) { bd = d; best = t; } }
+  $("where").textContent = best ? `Near ${best[0]} · zoom ${Math.round(z)}` : "";
+}
+
+/* ===== legend, scope, card ===== */
+function legend() {
+  const tbl = S.mode === "era" ? ERA : CPAIR, counts = new Array(tbl.length).fill(0);
+  for (let e = 0; e < NE; e++) if (scopeOk(e)) counts[clsOf(e)]++;
+  $("legend").innerHTML = tbl.map((t, i) => `<button class="chipk" data-i="${i}" aria-pressed="${S.on[S.mode][i]}"><i style="background:${colOf(tbl, i)}"></i>${t.k} <span>${fmt(counts[i])}</span></button>`).join("");
+  $("legend").querySelectorAll(".chipk").forEach(b => b.onclick = () => { const i = +b.dataset.i, arr = S.on[S.mode]; arr[i] = !arr[i]; if (!arr.some(Boolean)) arr.fill(true); legend(); redrawArcs(); note(); });
+}
+function note() {
+  let n = 0; for (let e = 0; e < NE; e++) if (isOn(e)) n++;
+  const sc = { all: "", ew: " between East and West (Cold War camps by present-day country)", ns: " between namesakes", end: " recorded as ended" }[S.scope];
+  $("mapNote").textContent = `Showing ${fmt(n)} of ${fmt(NE)} twinnings${sc}. Arcs follow the great-circle route, bowed slightly so short links read as arcs. Grey arcs have no start date on Wikidata. Click the map to zoom with the scroll wheel; pinch on a phone.`;
+}
+const NMc = i => D.names[i];
+function partnersOf(p) {
+  return ADJ[p].map(e => { const a = D.pairs[e * 5], b = D.pairs[e * 5 + 1], o = a === p ? b : a; return { e, o, s: D.pairs[e * 5 + 2], end: D.pairs[e * 5 + 3] }; })
+    .sort((x, y) => (x.s || 9999) - (y.s || 9999) || D.places[x.o][0].localeCompare(D.places[y.o][0]));
+}
+function cardPlace(p) {
+  const P = D.places[p], L = partnersOf(p), tbl = S.mode === "era" ? ERA : CPAIR;
+  $("cardH").textContent = "Town";
+  const nd = L.filter(x => x.s).length, ne = L.filter(x => x.end).length;
+  $("card").innerHTML = `<div class="big">${esc(P[0])}</div><p class="sub">${esc(NMc(P[3]))}${P[5] ? " · population " + fmt(P[5]) : ""} · <a href="https://www.wikidata.org/wiki/${P[6]}" target="_blank" rel="noopener">Wikidata</a></p>
+<p style="margin:0 0 4px"><b>${L.length}</b> partner${L.length === 1 ? "" : "s"}${nd ? `, ${nd} with a start date` : ", none dated"}${ne ? `, ${ne} ended` : ""}.</p>
+<ul class="plist">${L.map(x => { const o = D.places[x.o]; return `<li data-p="${x.o}"><i style="background:${colOf(tbl, clsOf(x.e))}"></i><span><b>${esc(o[0])}</b> <small>${esc(NMc(o[3]))}</small>${x.end ? `<span class="tag">ended ${x.end}</span>` : ""}</span><em>${x.s || "no date"}</em></li>`; }).join("")}</ul>`;
+  $("card").querySelectorAll(".plist li").forEach(li => li.onclick = () => selectPlace(+li.dataset.p, true));
+}
+function cardCountry(c) {
+  const F = focusSet(), part = new Map(); let dated = 0, n = 0, places = new Set();
+  for (const e of F) { n++; const a = D.pairs[e * 5], b = D.pairs[e * 5 + 1], ca = D.places[a][3], cb = D.places[b][3]; const o = ca === c ? cb : ca; part.set(o, (part.get(o) || 0) + 1); if (D.pairs[e * 5 + 2]) dated++; if (ca === c) places.add(a); if (cb === c) places.add(b); }
+  const top = [...part].sort((x, y) => y[1] - x[1]).slice(0, 10), mx = top.length ? top[0][1] : 1;
+  const tp = [...places].sort((x, y) => D.places[y][4] - D.places[x][4]).slice(0, 12);
+  $("cardH").textContent = "Country";
+  $("card").innerHTML = `<div class="big">${esc(NMc(c))}</div><p class="sub">${fmt(n)} twinnings involving ${fmt(places.size)} places; ${pct(dated / Math.max(1, n))} have a start date.</p>
+<h4>Most common partner countries</h4><div class="minibars">${top.map(([o, v]) => `<div><p>${o === c ? "within " + esc(NMc(o)) : esc(NMc(o))}<span style="width:${100 * v / mx}%"></span></p><b>${fmt(v)}</b></div>`).join("")}</div>
+<h4>Most-twinned places</h4><ul class="plist">${tp.map(p => `<li data-p="${p}"><i style="background:var(--dot)"></i><span><b>${esc(D.places[p][0])}</b></span><em>${D.places[p][4]}</em></li>`).join("")}</ul>`;
+  $("card").querySelectorAll(".plist li").forEach(li => li.onclick = () => selectPlace(+li.dataset.p, true));
+}
+function cardNone() { $("cardH").textContent = "Pick a town"; $("card").innerHTML = `<p class="sub">Tap or click a town on the map, or search for one. Each arc joins two twinned places; colour shows when the link began (or which continents it joins). Tap the legend to hide a group.</p>
+<h4>Some to try</h4><ul class="plist">${["Coventry", "Rio de Janeiro", "Kyiv", "Saarlouis", "Bethlehem", "Kyoto"].map(n => { const p = D.places.findIndex(x => x[0] === n); return p < 0 ? "" : `<li data-p="${p}"><i style="background:var(--accent)"></i><span><b>${esc(n)}</b> <small>${esc(NMc(D.places[p][3]))}</small></span><em>${D.places[p][4]}</em></li>`; }).join("")}</ul>`;
+  $("card").querySelectorAll(".plist li").forEach(li => li.onclick = () => selectPlace(+li.dataset.p, true)); }
+function bringMapIntoView() { if (innerWidth < 920) { const r = $("mapbox").getBoundingClientRect(); if (r.top < 0 || r.top > innerHeight * .35) $("mapbox").scrollIntoView({ behavior: "smooth", block: "start" }); } }
+function selectPlace(p, fly) {
+  S.place = p; S.country = -1; FOCUS = focusSet(); cardPlace(p); $("q").value = D.places[p][0];
+  if (fly && lmap) { const pts = [[D.places[p][1], D.places[p][2]], ...ADJ[p].map(e => { const a = D.pairs[e * 5], b = D.pairs[e * 5 + 1], o = a === p ? b : a; return [D.places[o][1], D.places[o][2]]; })];
+    const b = L.latLngBounds(pts); lmap.flyToBounds(b.pad(.15), { maxZoom: 6, duration: .8 }); }
+  redrawArcs(); bringMapIntoView(); }
+function selectCountry(c, fly) {
+  S.country = c; S.place = -1; FOCUS = focusSet(); cardCountry(c); $("q").value = NMc(c);
+  if (fly && lmap) { const pts = []; D.places.forEach(p => { if (p[3] === c) pts.push([p[1], p[2]]); }); if (pts.length) lmap.flyToBounds(L.latLngBounds(pts).pad(.6), { maxZoom: 4.5, duration: .8 }); }
+  redrawArcs(); bringMapIntoView(); }
+function clearSel() { S.place = -1; S.country = -1; FOCUS = null; $("q").value = ""; cardNone(); redrawArcs(); }
+
+/* ===== search ===== */
+function suggest(inp, list, pick) {
+  let items = [], cur = -1;
+  const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const render = () => { list.innerHTML = items.map((it, i) => `<li role="option" data-i="${i}" aria-selected="${i === cur}">${esc(it.t)} <span>${esc(it.s)}</span></li>`).join(""); list.style.display = items.length ? "block" : "none"; list.querySelectorAll("li").forEach(li => li.onmousedown = e => { e.preventDefault(); go(+li.dataset.i); }); };
+  const go = i => { const it = items[i]; if (!it) return; list.style.display = "none"; inp.blur(); pick(it); };
+  inp.addEventListener("input", () => { const v = norm(inp.value.trim()); cur = -1; if (v.length < 2) { items = []; render(); return; }
+    const out = [];
+    D.names.forEach((n, i) => { if (norm(n).startsWith(v)) out.push({ t: n, s: "country", c: i, r: 1e6 }); });
+    for (let i = 0; i < NP && out.length < 400; i++) { const nm = norm(D.places[i][0]); if (nm.startsWith(v) || (v.length > 3 && nm.includes(v))) out.push({ t: D.places[i][0], s: `${NMc(D.places[i][3])} · ${D.places[i][4]} partner${D.places[i][4] > 1 ? "s" : ""}`, p: i, r: D.places[i][4] + (nm === v ? 1e5 : 0) + (nm.startsWith(v) ? 1e3 : 0) }); }
+    items = out.sort((a, b) => b.r - a.r).slice(0, 12); render(); });
+  inp.addEventListener("keydown", e => { if (e.key === "ArrowDown") { cur = Math.min(items.length - 1, cur + 1); render(); e.preventDefault(); } else if (e.key === "ArrowUp") { cur = Math.max(0, cur - 1); render(); e.preventDefault(); } else if (e.key === "Enter") { go(Math.max(0, cur)); e.preventDefault(); } else if (e.key === "Escape") { list.style.display = "none"; } });
+  inp.addEventListener("blur", () => setTimeout(() => list.style.display = "none", 150));
+}
+
+/* ===== map click: nearest town within reach, else the country under the click ===== */
+function nearestPlace(cp, maxPx) {
+  const z = lmap.getZoom(), k = Math.pow(2, z), po = lmap.getPixelOrigin(), tl = lmap.containerPointToLayerPoint([0, 0]);
+  const ox = po.x + tl.x, oy = po.y + tl.y; let best = -1, bd = maxPx * maxPx;
+  const minDeg = Math.min(dotMin(z), z >= 6 ? 1 : 1e9);
+  const pref = FOCUS ? new Set([...FOCUS].flatMap(e => [D.pairs[e * 5], D.pairs[e * 5 + 1]])) : null;
+  for (let i = 0; i < NP; i++) { if (D.places[i][4] < minDeg && !(pref && pref.has(i))) continue; for (const sh of [0, -W0, W0]) { const dx = (PX[i] + sh) * k - ox - cp.x, dy = PY[i] * k - oy - cp.y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } } }
+  return best;
+}
+
+async function boot() {
+  const [pd, cj, tw] = await Promise.all(["data/page.json", "data/countries.json", "data/towns.json"].map(u => fetch(u).then(r => r.json())));
+  D = pd; CJ = cj; TOWNS = tw;
+  buildGeometry(); storyCharts(); legend(); note(); cardNone();
+  suggest($("q"), $("sug"), it => it.p != null ? selectPlace(it.p, true) : selectCountry(it.c, true));
+  $("clear").onclick = () => { clearSel(); if (lmap) lmap.flyTo([30, 10], innerWidth < 600 ? 1 : 2, { duration: .6 }); };
+  document.querySelectorAll("#mode .btn").forEach(b => b.onclick = () => { S.mode = b.dataset.m; document.querySelectorAll("#mode .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); legend(); note(); if (S.place >= 0) cardPlace(S.place); redrawArcs(); });
+  document.querySelectorAll("#scope .btn").forEach(b => b.onclick = () => { S.scope = b.dataset.s; document.querySelectorAll("#scope .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); legend(); note(); redrawArcs(); });
+  if (!window.L) { $("loading").textContent = "The map library did not load."; return; }
+  lmap = L.map("lmap", { minZoom: 1, maxZoom: 10, zoomSnap: .5, worldCopyJump: false, maxBounds: WORLD.pad(.05), maxBoundsViscosity: .8, scrollWheelZoom: false });
+  lmap.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  lmap.fitBounds(innerWidth < 600 ? [[25, -20], [62, 40]] : [[-40, -120], [68, 145]]);
+  for (const [k, p] of [["names", 640], ["arcs", 450], ["borders", 270], ["hills", 260], ["land", 250]]) lmap.createPane(k).style.zIndex = p;
+  for (const k of ["names", "hills", "borders", "arcs"]) lmap.getPane(k).style.pointerEvents = "none";
+  const esri = (svc, extra) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, attribution: "Tiles © Esri" + (extra || "") });
+  tiles = { light: esri("Canvas/World_Light_Gray_Base"), dark: esri("Canvas/World_Dark_Gray_Base"), satellite: esri("World_Imagery", ", Maxar, Earthstar Geographics") };
+  landL = L.geoJSON(cj, { pane: "land", renderer: L.canvas({ pane: "land", padding: .3 }), style: () => ({ stroke: false, fillColor: css("--land"), fillOpacity: 1 }) }).addTo(lmap);
+  borderL = L.geoJSON(cj, { pane: "borders", interactive: false, renderer: L.canvas({ pane: "borders", padding: .3 }), style: () => ({ color: css("--line"), weight: 1, opacity: .5, fill: false }) });
+  hillCv = document.createElement("canvas");
+  hillL = new CanvasOverlay(hillCv, WORLD, { pane: "hills", interactive: false, attribution: "Hills: AWS Terrain Tiles" });
+  nameL = L.layerGroup();
+  arcL = new ArcLayer().addTo(lmap);
+  L.control.scale({ imperial: false, position: "bottomleft" }).addTo(lmap);
+  lmap.attributionControl.addAttribution("Wikidata, Natural Earth, GeoNames");
+  initLayers(); applyLayers();
+  const ISO = {}; D.codes.forEach((c, i) => ISO[c] = i);
+  lmap.on("click", e => {
+    lmap.scrollWheelZoom.enable();
+    const p = nearestPlace(e.containerPoint, 12);
+    if (p >= 0) { selectPlace(p, false); return; }
+    let hit = -1; landL.eachLayer(l => { if (hit < 0 && l.getBounds().contains(e.latlng) && l.feature && pointIn(l.feature.geometry, e.latlng)) hit = ISO[l.feature.properties.iso] ?? -1; });
+    if (hit >= 0) selectCountry(hit, false); else clearSel();
+  });
+  lmap.on("mousemove", e => { if (lmap.getZoom() < 2.5) { lmap.getContainer().style.cursor = ""; return; } const p = nearestPlace(e.containerPoint, 10); lmap.getContainer().style.cursor = p >= 0 ? "pointer" : ""; if (p >= 0) showTip(`<b>${esc(D.places[p][0])}</b><br>${esc(NMc(D.places[p][3]))} · ${D.places[p][4]} partner${D.places[p][4] > 1 ? "s" : ""}`, e.originalEvent.pageX - scrollX, e.originalEvent.pageY - scrollY); else hideTip(); });
+  lmap.on("mouseout", hideTip);
+  lmap.getContainer().appendChild($("where"));
+  $("loading").style.display = "none";
+  whereAmI();
+}
+function pointIn(geom, ll) {
+  const x = ll.lng, y = ll.lat, polys = geom.type === "Polygon" ? [geom.coordinates] : geom.coordinates;
+  for (const poly of polys) { let inside = false; const r = poly[0]; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { if (((r[i][1] > y) !== (r[j][1] > y)) && (x < (r[j][0] - r[i][0]) * (y - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0])) inside = !inside; } if (inside) return true; }
+  return false;
+}
+boot().catch(e => { $("loading").textContent = "Could not load the data: " + e.message; console.error(e); });
+</script>
+<!-- map-fullscreen v1 -->
+<style id="mfs-style">
+.mfs-btn{position:absolute;top:10px;right:10px;z-index:1001;width:34px;height:34px;border:2px solid rgba(0,0,0,.25);border-radius:4px;background:#fff;color:#222;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.mfs-btn:hover{background:#f2f2f2}
+.mfs-btn svg{width:18px;height:18px}
+.mfs-host.mfs-btn-left .mfs-btn{right:auto;left:54px}
+.mfs-fake{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;z-index:100000!important;border-radius:0!important}
+html.mfs-lock,html.mfs-lock body{overflow:hidden!important}
+:fullscreen.mfs-host{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important}
+</style>
+<script id="mfs-script">
+(function(){
+  var ICON_OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+  var ICON_CLOSE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+  function poke(){setTimeout(function(){window.dispatchEvent(new Event('resize'));},60);setTimeout(function(){window.dispatchEvent(new Event('resize'));},400);}
+  function realFS(){return document.fullscreenElement||document.webkitFullscreenElement;}
+  function add(el){
+    if(el.__mfs)return; el.__mfs=1;
+    var cs=getComputedStyle(el); if(cs.position==='static')el.style.position='relative';
+    el.classList.add('mfs-host');
+    // avoid clashing with a top-right Leaflet control (e.g. "Map layers")
+    var tr=el.querySelector('.leaflet-top.leaflet-right');
+    if(tr&&tr.children.length){ el.classList.add('mfs-btn-left'); }
+    var b=document.createElement('button'); b.type='button'; b.className='mfs-btn';
+    b.title='Full screen map'; b.setAttribute('aria-label','Full screen map'); b.innerHTML=ICON_OPEN;
+    ['click','dblclick','mousedown','touchstart','wheel'].forEach(function(t){b.addEventListener(t,function(e){e.stopPropagation();},{passive:t!=='click'});});
+    function setIcon(on){b.innerHTML=on?ICON_CLOSE:ICON_OPEN;b.title=on?'Exit full screen':'Full screen map';b.setAttribute('aria-label',b.title);}
+    function exitFake(){el.classList.remove('mfs-fake');document.documentElement.classList.remove('mfs-lock');setIcon(false);poke();}
+    b.addEventListener('click',function(e){
+      e.preventDefault();
+      if(el.classList.contains('mfs-fake')){exitFake();return;}
+      if(realFS()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return;}
+      var req=el.requestFullscreen||el.webkitRequestFullscreen;
+      if(req){ try{ var p=req.call(el); if(p&&p.catch)p.catch(function(){el.classList.add('mfs-fake');document.documentElement.classList.add('mfs-lock');setIcon(true);poke();}); }catch(err){el.classList.add('mfs-fake');document.documentElement.classList.add('mfs-lock');setIcon(true);poke();} }
+      else { el.classList.add('mfs-fake');document.documentElement.classList.add('mfs-lock');setIcon(true);poke(); }
+    });
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&el.classList.contains('mfs-fake'))exitFake();});
+    ['fullscreenchange','webkitfullscreenchange'].forEach(function(t){document.addEventListener(t,function(){setIcon(realFS()===el);poke();});});
+    el.appendChild(b);
+  }
+  function scan(){
+    var els=document.querySelectorAll('[data-fullscreen-map], .leaflet-container, .maplibregl-map, .mapboxgl-map');
+    els.forEach(function(el){
+      if(el.closest('.mfs-host')&&!el.classList.contains('mfs-host'))return;
+      var r=el.getBoundingClientRect(); if(r.width<200||r.height<150)return;
+      add(el);
+    });
+  }
+  function start(){scan(); var n=0; var t=setInterval(function(){scan(); if(++n>20)clearInterval(t);},500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+<!-- /map-fullscreen -->
+</body>
+</html>
